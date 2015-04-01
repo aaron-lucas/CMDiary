@@ -1,0 +1,8 @@
+# Database files
+*.db
+
+# __pycache__ directory
+__pycache__/
+
+# PyCharm Project Settings
+.idea/
