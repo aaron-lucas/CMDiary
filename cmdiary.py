@@ -65,13 +65,6 @@ def format_date(date_str):
 
 def format_args(cmd, args):
 	try:
-		if cmd in ('remove', 'edit', 'extend'):
-			args[0] = int(args[0])
-			if args[0] not in diary.taken_uids:
-				raise NonexistentUIDError
-	except IndexError:
-		pass
-	try:
 		if cmd == 'add':
 			args[0] = TYPES[args[0]]
 		elif cmd in ('edit', 'extend'):
@@ -80,9 +73,16 @@ def format_args(cmd, args):
 			return []
 		elif cmd == 'help' and args:
 			args[0] = COMMAND_ABBREVS.get(args[0], args[0])
-		return args[:1]
 	except (KeyError, IndexError):
 		raise InvalidArgumentError
+	try:
+		if cmd in ('remove', 'edit', 'extend'):
+			args[0] = int(args[0])
+			if args[0] not in diary.taken_uids:
+				raise NonexistentUIDError
+	except IndexError:
+		raise InvalidArgumentError
+	return args[:1]
 
 def prompt():
 	print()
