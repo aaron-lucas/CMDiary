@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from termcolor import colored
+import re
 
 COMMANDS = OrderedDict([('add',     '(a)dd     <type> - add new entry'),
                         ('remove',  '(r)emove  <uid> - remove an entry'),
@@ -27,3 +28,8 @@ def help(cmd=None):
 		print('Attributes: {}'.format(', '.join(ATTRIBUTES)))
 	else:
 		print(' '.join(COMMANDS.get(cmd, colored('No help section for {}'.format(cmd), 'yellow')).split()))
+
+def count_required_args(command_template):
+	return len(re.findall('<.+>', command_template))
+
+required_args = {key: count_required_args(value) for (key, value) in dict(COMMANDS).items()}

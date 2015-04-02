@@ -65,16 +65,15 @@ def format_date(date_str):
 
 def format_args(cmd, args):
 	try:
+		expected_args = help.required_args.get(cmd, 0)
 		if cmd == 'add':
 			args[0] = TYPES[args[0]]
-		elif cmd in ('edit', 'extend'):
-			return args[:2]
-		elif cmd in ('quit', 'list'):
-			return []
 		elif cmd == 'help' and args:
 			args[0] = COMMAND_ABBREVS.get(args[0], args[0])
-	except (KeyError, IndexError):
+	except IndexError:
 		raise InvalidArgumentError
+	except KeyError:
+		pass
 	try:
 		if cmd in ('remove', 'edit', 'extend'):
 			args[0] = int(args[0])
@@ -82,7 +81,7 @@ def format_args(cmd, args):
 				raise NonexistentUIDError
 	except IndexError:
 		raise InvalidArgumentError
-	return args[:1]
+	return args[:expected_args]
 
 def prompt():
 	print()
