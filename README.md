@@ -7,7 +7,7 @@
 - [termcolor module](https://pypi.python.org/pypi/tabulate)
 
 ###Installing Python Modules
-Use `[pip](https://pip.pypa.io/en/latest/index.html)`, Python's package manager to install `tabulate` and `termcolor` with the following commands:
+Use [`pip`](https://pip.pypa.io/en/latest/index.html), Python's package manager to install `tabulate` and `termcolor` with the following commands:
 ```
 pip3 install tabulate
 pip3 install termcolor
