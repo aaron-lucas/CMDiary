@@ -82,7 +82,7 @@ def format_args(cmd, args):
 			args[0] = int(args[0])
 			if args[0] not in diary.taken_uids:
 				raise NonexistentUIDError
-	except IndexError:
+	except (IndexError, ValueError):
 		raise InvalidArgumentError
 	return args[:expected_args]
 
