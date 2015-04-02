@@ -1,4 +1,4 @@
-#CMDIARY
+#CMDiary
 ###_A Command-line Diary Program_
 
 ##Requirements
