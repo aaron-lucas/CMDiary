@@ -6,3 +6,6 @@ __pycache__/
 
 # PyCharm Project Settings
 .idea/
+
+#OS X .DS_Store file
+.DS_Store
