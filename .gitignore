@@ -1,5 +1,5 @@
-# Database files
-*.db
+# Data files
+*.pickle
 
 # __pycache__ directory
 __pycache__/
