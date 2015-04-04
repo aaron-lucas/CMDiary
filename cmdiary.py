@@ -64,10 +64,7 @@ def format_date(date_str):
 	return datetime.date(y, m, d)
 
 def format_args(cmd, args):
-	try:
-		expected_args = help.required_args.get(cmd, 0)
-	except KeyError:
-		pass
+	expected_args = help.required_args.get(cmd, 0)
 
 	try:
 		if cmd == 'add':
