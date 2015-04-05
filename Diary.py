@@ -5,10 +5,10 @@ from random import randint
 
 def update_data(func):
 		def wrapper(self, *args, **kwargs):
-			retval = func(*args, **kwargs)
+			retval = func(self, *args, **kwargs)
 			with open('data.pickle', 'wb') as file:
 				for entry in self.entries:
-					file.write(pickle.dumps(entry, pickle.HIGHEST_PROTOCOL))
+					file.write(pickle.dumps(entry.data, pickle.HIGHEST_PROTOCOL))
 			return retval
 		return wrapper
 
@@ -35,7 +35,7 @@ class Diary(object):
 
 	@update_data
 	def add(self, item_type, subject, description, due_date):
-		self.entries.append(DiaryEntry(self, item_type, subject, description,due_date))
+		self.entries.append(DiaryEntry(self, item_type, subject, description, due_date))
 
 	@update_data
 	def remove(self, *uids):
@@ -43,7 +43,7 @@ class Diary(object):
 			self.entries.remove(uid)
 
 	@update_data
-	def edit(self, *uids, attr, value):
+	def edit(self, attr, value, *uids):
 		for entry in self.entries:
 			if entry.uid in uids:
 				entry.edit(attr, value)

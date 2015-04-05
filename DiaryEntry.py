@@ -14,7 +14,7 @@ class CheckedVar(object):
 	def __init__(self, data_type, options=None, default=None):
 		self._store_id = '__CheckedVar_{}'.format(id(self))
 		self.data_type = data_type
-		self.options = set() if options is None else set(filter(lambda x: isinstance(x, data_type)))
+		self.options = set() if options is None else set(filter(lambda x: isinstance(x, data_type), options))
 		self.default = default if self.is_valid_value(default) else None
 
 	def __set__(self, instance, value):
@@ -41,13 +41,13 @@ class DiaryEntry(object):
 	due_date = CheckedVar(datetime.date)
 	item_type = CheckedVar(str, [HOMEWORK, ASSESSMENT, NOTE])
 
-	def __init__(self, owner, item_type, subject, descripton, due_date, id=None):
+	def __init__(self, owner, item_type, subject, description, due_date, uid=None):
 		self.owner = owner
 		self.item_type = item_type
 		self.subject = subject
-		self.description = descripton
+		self.description = description
 		self.due_date = due_date
-		self.id = owner.generate_id() if id is None else id
+		self.uid = owner.allocate_uid() if uid is None else uid
 
 	def edit(self, attr, value):
 		if attr in (UID, SUBJECT, DESCRIPTION, DUE_DATE, ITEM_TYPE):
