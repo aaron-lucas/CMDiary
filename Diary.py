@@ -2,6 +2,7 @@ import pickle
 from DiaryEntry import DiaryEntry
 import os.path
 from random import randint
+import datetime
 
 def update_data(func):
 		def wrapper(self, *args, **kwargs):
@@ -47,6 +48,14 @@ class Diary(object):
 		for entry in self.entries:
 			if entry.uid in uids:
 				entry.edit(attr, value)
+
+	@update_data
+	def extend(self, days, *uids):
+		for entry in self.entries:
+			if entry.uid in uids:
+				if entry.due_date is None:
+					continue
+				entry.due_date += datetime.timedelta(days=days)
 
 	def allocate_uid(self):
 		while True:
