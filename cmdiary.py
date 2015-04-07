@@ -22,11 +22,13 @@ def format_input(input_string):
 	pass
 
 def add(input_data):
-	re_command = re.compile('^([a-zA-Z]*?) ')
-	re_item_type = re.compile('([ahn]|assessment|homework|note)')
-	re_subject = re.compile(r' (.*?)[\;]')
-	re_description = re.compile('r[\;](.*?)[\;]')
-	re_due_date = re.compile(r'[\;](([0-9]{1,2}){1,2}([0-9]{4})?)$')
+	command, item_type, subject = input_data.split()[:3]
+	unparsed_data = ' '.join(input_data.split()[3:])
+	re_due_date = re.compile(r' (([0-9]{1,2} ?){1,3})$')
+	match = re.search(re_due_date, unparsed_data)
+	due_date = match.group(1)
+	description = match.string[:match.start()]
+
 
 
 def remove(input_data):
