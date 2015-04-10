@@ -40,8 +40,9 @@ class Diary(object):
 
 	@update_data
 	def remove(self, *uids):
-		for uid in uids:
-			self.entries.remove(uid)
+		for entry in self.entries:
+			if entry.uid in uids:
+				self.entries.remove(entry)
 
 	@update_data
 	def edit(self, attr, value, *uids):

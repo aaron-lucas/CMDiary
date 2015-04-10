@@ -6,6 +6,18 @@ import datetime
 from collections import OrderedDict
 from ParameterInfo import ParameterInfo
 
+ATTRIBUTE = 'attribute'
+VALUE = 'value' # Changes depending on chosen attribute - used in edit()
+DAYS = 'days' # days parameter name/reference
+
+def requires_parameters(*params):
+	def decorator(func):
+		def wrapper(input_data):
+			required_data = OrderedDict([(key, False) for key in params])
+			return func(input_data, required_data)
+		return wrapper
+	return decorator
+
 def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg='Invalid Argument'):
 	while True:
 		inp = input(prompt)
@@ -21,43 +33,64 @@ def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg=
 			message = err_msg.format(inp) if '{}' in err_msg else err_msg
 			cprint(message, 'yellow')
 
-def format_input(input_string):
-	pass
-
-def add(input_data):
-	required_data = OrderedDict([(ITEM_TYPE, False),
-	                             (SUBJECT, False),
-	                             (DESCRIPTION, False),
-	                             (DUE_DATE, False)])
+@requires_parameters(ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE)
+def add(input_data, required_data):
 	try:
-		required_data[ITEM_TYPE] = list(input_data.split())[0]
-		required_data[SUBJECT] = list(input_data.split())[1]
+		required_data[ITEM_TYPE] = input_data.split()[0]
+		required_data[SUBJECT] = input_data.split()[1]
 	except IndexError:
 		pass
 
 	unparsed_data = ' '.join(input_data.split()[2:])
-	re_due_date = re.compile(r' (([0-9]{1,2} ?){1,2}([0-9]{4})?)$')
-	match = re.search(re_due_date, unparsed_data)
+
+	match = re.search(RE_DUE_DATE, unparsed_data)
 
 	required_data[DUE_DATE] = match.group(1) if match is not None else False
 	required_data[DESCRIPTION] = match.string[:match.start()] if match is not None else False
 
-	print("Raw: ", required_data)
 	format_existing_data(required_data)
-	print('After format: ', required_data)
 	complete_data(required_data)
-	print('After processing: ', required_data)
 
 	diary.add(**required_data)
 
-def remove(input_data):
-	pass
+@requires_parameters(UID)
+def remove(input_data, required_data):
+	try:
+		required_data[UID] = input_data.split()[0]
+	except IndexError:
+		pass
 
-def edit(input_data):
-	pass
+	format_existing_data(required_data)
+	complete_data(required_data)
 
-def extend(input_data):
-	pass
+	diary.remove(required_data[UID])
+
+@requires_parameters(UID, ATTRIBUTE, VALUE)
+def edit(input_data, required_data):
+	try:
+		required_data[UID] = input_data.split()[0]
+		required_data[ATTRIBUTE] = input_data.split()[1]
+		required_data[VALUE] = ' '.join(input_data.split()[2:])
+	except IndexError:
+		pass
+
+	format_existing_data(required_data)
+	complete_data(required_data)
+
+	diary.edit(required_data[ATTRIBUTE], required_data[VALUE], required_data[UID])
+
+@requires_parameters(UID, DAYS)
+def extend(input_data, required_data):
+	try:
+		required_data[UID] = input_data.split()[0]
+		required_data[DAYS] = input_data.split()[1]
+	except IndexError:
+		pass
+
+	format_existing_data(required_data)
+	complete_data(required_data)
+
+	diary.extend(required_data[DAYS], required_data[UID])
 
 def list_items():
 	pass
@@ -88,20 +121,21 @@ def date_to_str():
 
 def validate_date(string):
 	try:
-		test_date = str_to_date(string)
+		_test_date = str_to_date(string)
 	except ValueError:
 		return False
-
 	return True
 
 
 def complete_data(data):
 	for key, value in data.items():
 		if value:
-			continue
-
+			continue # Data is already present
+		if data.get(ATTRIBUTE, False):
+			i_value = PARAMETERS[ATTRIBUTES[data[ATTRIBUTE]]]
 		label = key.capitalize().replace('_', ' ') + ': '
-		param_info = PARAMETERS[key]
+
+		param_info = PARAMETERS[key] if key != VALUE else i_value
 
 		data[key] = get_input(prompt=label,
 		                      response_type=param_info.data_type,
@@ -109,32 +143,22 @@ def complete_data(data):
 		                      modifier=param_info.modifier,
 		                      err_msg=param_info.err_msg)
 
-
 def format_existing_data(data):
 	for key, value in data.items():
 		if not value:
 			continue
-		param_info = PARAMETERS[key]
-		if param_info.condition is None or param_info.condition(value):
-			data[key] = param_info.modifier(value) if param_info.modifier is not None else value
+		if data.get(ATTRIBUTE, False):
+			i_value = PARAMETERS[ATTRIBUTES[data[ATTRIBUTE]]]
+		param_info = PARAMETERS[key] if key != VALUE else i_value
+		try:
+			value = param_info.data_type(value)
+		except ValueError:
+			pass
 		else:
-			data[key] = False # Mark data as invalid by resetting value
-
-
-"""ABBREVIATIONS = {'a': (add, ASSESSMENT),
-                'd': DESCRIPTION,
-                'due': DUE_DATE,
-                'e': edit,
-                'f': filter,
-                'h': (help, HOMEWORK),
-                'l': list,
-                'n': NOTE,
-                'q': quit,
-                'r': remove,
-                's': SUBJECT,
-                't': ITEM_TYPE,
-                'u': UID,
-                'x': extend}"""
+			if param_info.condition is None or param_info.condition(value):
+				data[key] = param_info.modifier(value) if param_info.modifier is not None else value
+				continue
+		data[key] = False # Mark data as invalid by resetting value
 
 ITEM_TYPES = {
 	'a': ASSESSMENT, 'assessment': ASSESSMENT,
@@ -148,7 +172,7 @@ diary = Diary()
 # Variables with the i_ prefix are ParameterInfo types.
 i_uid =         ParameterInfo(UID,
                               int,
-                              condition=lambda uid: uid in diary.taken_uids,
+                              condition=lambda uid: int(uid) in diary.taken_uids,
                               err_msg='Object with UID {} does not exist')
 
 i_item_type =   ParameterInfo(ITEM_TYPE,
@@ -164,14 +188,35 @@ i_due_date =    ParameterInfo(DUE_DATE,
                               condition=validate_date,
                               modifier=str_to_date,
                               err_msg='Invalid date. Date format is dd/mm/yyyy. See help page for more info.')
+i_attr =        ParameterInfo(ATTRIBUTE,
+                              condition=lambda attr: attr in ATTRIBUTES,
+                              modifier=lambda attr: ATTRIBUTES[attr],
+                              err_msg="Attribute '{}' does not exist")
+i_days =        ParameterInfo(DAYS,
+                              int)
+
+# Define regexs for matching sections of input
+RE_DUE_DATE = re.compile(r' (([0-9]{1,2} ?){1,2}([0-9]{4})?)$')
 
 PARAMETERS = {UID: i_uid,
               ITEM_TYPE: i_item_type,
               SUBJECT: i_subject,
               DESCRIPTION: i_description,
-              DUE_DATE: i_due_date}
+              DUE_DATE: i_due_date,
+              ATTRIBUTE: i_attr,
+              DAYS: i_days}
+
+ATTRIBUTES = ({'u': UID, UID: UID,
+               'i': ITEM_TYPE, ITEM_TYPE: ITEM_TYPE,
+               's': SUBJECT, SUBJECT: SUBJECT,
+               'd': DESCRIPTION, DESCRIPTION: DESCRIPTION,
+               'due': DUE_DATE, DUE_DATE: DUE_DATE})
 
 # Testing code for debug purposes
+
 add('homework maths worksheet q1-2 5')
-add('h')
+print([entry.uid for entry in diary.entries])
+# add('h')
+extend('')
+#remove('')
 print([entry.data for entry in diary.entries])
