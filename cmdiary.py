@@ -1,3 +1,10 @@
+# CMDiary - a command-line diary application
+
+VERSION = 'v2.0'
+AUTHOR = 'Aaron Lucas'
+GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
+
+
 from DiaryEntry import ASSESSMENT, HOMEWORK, NOTE, UID, ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE
 from Diary import Diary
 from termcolor import cprint, colored
@@ -46,7 +53,7 @@ def add(input_data, required_data):
 	match = re.search(RE_DUE_DATE, unparsed_data)
 
 	required_data[DUE_DATE] = match.group(1) if match is not None else False
-	required_data[DESCRIPTION] = match.string[:match.start()] if match is not None else False
+	required_data[DESCRIPTION] = match.string[:match.start()] if match is not None else unparsed_data
 
 	format_existing_data(required_data)
 	complete_data(required_data)
@@ -160,11 +167,13 @@ def format_existing_data(data):
 				continue
 		data[key] = False # Mark data as invalid by resetting value
 
-ITEM_TYPES = {
-	'a': ASSESSMENT, 'assessment': ASSESSMENT,
-	'h': HOMEWORK, 'homework': HOMEWORK,
-	'n': NOTE, 'note': NOTE
-}
+def prompt():
+	inp = input('CMDiary {}> '.format(VERSION))
+	split_input = inp.split(maxsplit=1)
+	command = split_input[0]
+	command = COMMANDS.get(command, None)
+	args = split_input[1] if len(split_input) == 2 else ''
+	return command, args
 
 diary = Diary()
 
@@ -195,8 +204,10 @@ i_attr =        ParameterInfo(ATTRIBUTE,
 i_days =        ParameterInfo(DAYS,
                               int)
 
-# Define regexs for matching sections of input
+# Define regex for matching sections of input
 RE_DUE_DATE = re.compile(r' (([0-9]{1,2} ?){1,2}([0-9]{4})?)$')
+
+# Define dicts of possible inputs and abbreviations
 
 PARAMETERS = {UID: i_uid,
               ITEM_TYPE: i_item_type,
@@ -212,11 +223,26 @@ ATTRIBUTES = ({'u': UID, UID: UID,
                'd': DESCRIPTION, DESCRIPTION: DESCRIPTION,
                'due': DUE_DATE, DUE_DATE: DUE_DATE})
 
-# Testing code for debug purposes
+ITEM_TYPES = {
+	'a': ASSESSMENT, 'assessment': ASSESSMENT,
+	'h': HOMEWORK, 'homework': HOMEWORK,
+	'n': NOTE, 'note': NOTE
+}
 
-add('homework maths worksheet q1-2 5')
-print([entry.uid for entry in diary.entries])
-# add('h')
-extend('')
-#remove('')
-print([entry.data for entry in diary.entries])
+COMMANDS = {'add': add, 'a': add,
+            'remove': remove, 'r': remove,
+            'edit': edit, 'e': edit,
+            'extend': extend, 'x': extend,
+            'quit': quit, 'q': quit,
+            'list': list_items, 'l': list_items()}
+
+
+
+# Run the diary
+if __name__ == '__main__':
+	while True:
+		command, args = prompt()
+		if command is None:
+			cprint('{} is not a valid command'.format(command), 'yellow')
+			continue
+		command(args)
