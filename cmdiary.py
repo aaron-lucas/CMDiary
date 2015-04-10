@@ -2,6 +2,8 @@ from DiaryEntry import ASSESSMENT, HOMEWORK, NOTE, UID, ITEM_TYPE, SUBJECT, DESC
 from Diary import Diary
 from termcolor import cprint, colored
 import re
+import datetime
+from collections import OrderedDict
 
 diary = Diary()
 
@@ -22,14 +24,25 @@ def format_input(input_string):
 	pass
 
 def add(input_data):
-	command, item_type, subject = input_data.split()[:3]
-	unparsed_data = ' '.join(input_data.split()[3:])
-	re_due_date = re.compile(r' (([0-9]{1,2} ?){1,3})$')
+	required_data = OrderedDict([(ITEM_TYPE, False),
+	                             (SUBJECT, False),
+	                             (DESCRIPTION, False),
+	                             (DUE_DATE, False)])
+
+	required_data[ITEM_TYPE] = list(input_data.split())[:1]
+	required_data[SUBJECT] = list(input_data.split())[1:2]
+
+	unparsed_data = ' '.join(input_data.split()[2:])
+	re_due_date = re.compile(r' (([0-9]{1,2} ?){1,2}([0-9]{4})?)$')
 	match = re.search(re_due_date, unparsed_data)
-	due_date = match.group(1)
-	description = match.string[:match.start()]
 
+	required_data[DUE_DATE] = match.group(1) if match is not None else False
+	required_data[DESCRIPTION] = match.string[:match.start()] if match is not None else False
 
+	complete_data(required_data)
+	print(required_data)
+	format_data(required_data)
+	#diary.add(item_type, subject, description, due_date)
 
 def remove(input_data):
 	pass
@@ -40,8 +53,41 @@ def edit(input_data):
 def extend(input_data):
 	pass
 
-def list():
+def list_items():
 	pass
+
+def str_to_date(string, separator='/'):
+	if not string:
+		return None
+	components = string.split(separator)
+	today = datetime.date.today()
+
+	day = int(components[0]) if len(components) >= 1 else today.day
+	month = int(components[1]) if len(components) >= 2 else today.month
+	year = int(components[2]) if len(components) >= 3 else today.year
+
+	return datetime.date(year, month, day)
+
+def date_to_str():
+	pass
+
+def complete_data(data):
+	for key, value in data.items():
+		if value:
+			continue
+		label = key.replace('_', ' ') + ': '
+		data[key] = input(label)
+def format_data(data):
+	for key, value in data.items:
+		if key in (SUBJECT, DESCRIPTION):
+			if value in (False, None):
+				value = None
+			else:
+				value = str(value)
+		elif key == ITEM_TYPE:
+			value = ITEM_TYPES.get(value, None)
+		elif key == DUE_DATE:
+			value = str_to_date(value, separator=' ')
 
 ABBREVIATIONS = {'a': (add, ASSESSMENT),
                 'd': DESCRIPTION,
@@ -57,3 +103,12 @@ ABBREVIATIONS = {'a': (add, ASSESSMENT),
                 't': ITEM_TYPE,
                 'u': UID,
                 'x': extend}
+
+ITEM_TYPES = {
+	'a': ASSESSMENT, 'assessment': ASSESSMENT,
+	'h': HOMEWORK, 'homework': HOMEWORK,
+	'n': NOTE, 'note': NOTE
+}
+
+add('homework maths worksheet q1-2 5')
+add('')
