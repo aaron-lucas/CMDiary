@@ -4,8 +4,7 @@ from termcolor import cprint, colored
 import re
 import datetime
 from collections import OrderedDict
-
-diary = Diary()
+from ParameterInfo import ParameterInfo
 
 def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg='Invalid Argument'):
 	while True:
@@ -19,9 +18,8 @@ def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg=
 			if condition is None or condition(inp):
 				return inp if modifier is None else modifier(inp)
 
-			if '{}' in err_msg:
-				err_msg = err_msg.format(inp)
-			cprint(err_msg, 'yellow')
+			message = err_msg.format(inp) if '{}' in err_msg else err_msg
+			cprint(message, 'yellow')
 
 def format_input(input_string):
 	pass
@@ -44,8 +42,12 @@ def add(input_data):
 	required_data[DUE_DATE] = match.group(1) if match is not None else False
 	required_data[DESCRIPTION] = match.string[:match.start()] if match is not None else False
 
+	print("Raw: ", required_data)
+	format_existing_data(required_data)
+	print('After format: ', required_data)
 	complete_data(required_data)
-	format_data(required_data)
+	print('After processing: ', required_data)
+
 	diary.add(**required_data)
 
 def remove(input_data):
@@ -98,33 +100,26 @@ def complete_data(data):
 		if value:
 			continue
 
-		if key == UID:
-			data[key] = get_input('UID: ',
-			                      int,
-			                      condition=lambda uid: uid in diary.taken_uids,
-			                      err_msg='Object with UID {} does not exist')
-		elif key == ITEM_TYPE:
-			data[key] = get_input('Item type: ',
-			                      condition=lambda x: x in ITEM_TYPES.keys(),
-			                      modifier=lambda x: ITEM_TYPES.get(x, HOMEWORK))
-		elif key in (SUBJECT, DESCRIPTION):
-			data[key] = get_input(key.capitalize()+': ')
-		elif key == DUE_DATE:
-			data[key] = get_input('Due date: ',
-			                      condition=validate_date,
-			                      modifier=str_to_date)
+		label = key.capitalize().replace('_', ' ') + ': '
+		param_info = PARAMETERS[key]
 
-def format_data(data):
+		data[key] = get_input(prompt=label,
+		                      response_type=param_info.data_type,
+		                      condition=param_info.condition,
+		                      modifier=param_info.modifier,
+		                      err_msg=param_info.err_msg)
+
+
+def format_existing_data(data):
 	for key, value in data.items():
-		if key in (SUBJECT, DESCRIPTION):
-			if value in (False, None):
-				data[key] = None
-			else:
-				data[key] = str(value)
-		elif key == ITEM_TYPE:
-			data[key] = ITEM_TYPES.get(value, None)
-		elif key == DUE_DATE:
-			data[key] = str_to_date(value)
+		if not value:
+			continue
+		param_info = PARAMETERS[key]
+		if param_info.condition is None or param_info.condition(value):
+			data[key] = param_info.modifier(value) if param_info.modifier is not None else value
+		else:
+			data[key] = False # Mark data as invalid by resetting value
+
 
 """ABBREVIATIONS = {'a': (add, ASSESSMENT),
                 'd': DESCRIPTION,
@@ -147,5 +142,36 @@ ITEM_TYPES = {
 	'n': NOTE, 'note': NOTE
 }
 
+diary = Diary()
+
+# Define command parameters and required information.
+# Variables with the i_ prefix are ParameterInfo types.
+i_uid =         ParameterInfo(UID,
+                              int,
+                              condition=lambda uid: uid in diary.taken_uids,
+                              err_msg='Object with UID {} does not exist')
+
+i_item_type =   ParameterInfo(ITEM_TYPE,
+                              condition=lambda x: x in ITEM_TYPES.keys(),
+                              modifier=lambda x: ITEM_TYPES.get(x, HOMEWORK),
+                              err_msg='Item type {} does not exist')
+
+i_subject =     ParameterInfo(SUBJECT)
+
+i_description = ParameterInfo(DESCRIPTION)
+
+i_due_date =    ParameterInfo(DUE_DATE,
+                              condition=validate_date,
+                              modifier=str_to_date,
+                              err_msg='Invalid date. Date format is dd/mm/yyyy. See help page for more info.')
+
+PARAMETERS = {UID: i_uid,
+              ITEM_TYPE: i_item_type,
+              SUBJECT: i_subject,
+              DESCRIPTION: i_description,
+              DUE_DATE: i_due_date}
+
+# Testing code for debug purposes
 add('homework maths worksheet q1-2 5')
-add('')
+add('h')
+print([entry.data for entry in diary.entries])
