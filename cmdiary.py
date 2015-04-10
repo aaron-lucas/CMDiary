@@ -45,9 +45,8 @@ def add(input_data):
 	required_data[DESCRIPTION] = match.string[:match.start()] if match is not None else False
 
 	complete_data(required_data)
-	print(required_data)
 	format_data(required_data)
-	#diary.add(item_type, subject, description, due_date)
+	diary.add(**required_data)
 
 def remove(input_data):
 	pass
@@ -62,6 +61,9 @@ def list_items():
 	pass
 
 def determine_date_separator(string):
+	if not string:
+		return None
+
 	for separator in (' ', '/', '-'):
 		if separator in string:
 			return separator
@@ -70,7 +72,7 @@ def str_to_date(string):
 	separator = determine_date_separator(string)
 	if not string:
 		return None
-	components = string.split(separator)
+	components = string.split(separator) if separator is not None else [string]
 	today = datetime.date.today()
 
 	day = int(components[0]) if len(components) >= 1 else today.day
@@ -83,10 +85,8 @@ def date_to_str():
 	pass
 
 def validate_date(string):
-	separator = determine_date_separator(string)
-
 	try:
-		test_date = str_to_date(string, separator)
+		test_date = str_to_date(string)
 	except ValueError:
 		return False
 
@@ -97,28 +97,36 @@ def complete_data(data):
 	for key, value in data.items():
 		if value:
 			continue
+
 		if key == UID:
-			data[key] = get_input('UID: ', int, condition=lambda uid: uid in diary.taken_uids, err_msg='Object with UID {} does not exist')
+			data[key] = get_input('UID: ',
+			                      int,
+			                      condition=lambda uid: uid in diary.taken_uids,
+			                      err_msg='Object with UID {} does not exist')
 		elif key == ITEM_TYPE:
-			data[key] = get_input('Item type: ', condition=lambda x: x in ITEM_TYPES.keys())
+			data[key] = get_input('Item type: ',
+			                      condition=lambda x: x in ITEM_TYPES.keys(),
+			                      modifier=lambda x: ITEM_TYPES.get(x, HOMEWORK))
 		elif key in (SUBJECT, DESCRIPTION):
 			data[key] = get_input(key.capitalize()+': ')
 		elif key == DUE_DATE:
-			data[key] = get_input('Due date: ', str, condition=validate_date, modifier=str_to_date)
+			data[key] = get_input('Due date: ',
+			                      condition=validate_date,
+			                      modifier=str_to_date)
 
 def format_data(data):
 	for key, value in data.items():
 		if key in (SUBJECT, DESCRIPTION):
 			if value in (False, None):
-				value = None
+				data[key] = None
 			else:
-				value = str(value)
+				data[key] = str(value)
 		elif key == ITEM_TYPE:
-			value = ITEM_TYPES.get(value, None)
+			data[key] = ITEM_TYPES.get(value, None)
 		elif key == DUE_DATE:
-			value = str_to_date(value, separator=' ')
+			data[key] = str_to_date(value)
 
-ABBREVIATIONS = {'a': (add, ASSESSMENT),
+"""ABBREVIATIONS = {'a': (add, ASSESSMENT),
                 'd': DESCRIPTION,
                 'due': DUE_DATE,
                 'e': edit,
@@ -131,7 +139,7 @@ ABBREVIATIONS = {'a': (add, ASSESSMENT),
                 's': SUBJECT,
                 't': ITEM_TYPE,
                 'u': UID,
-                'x': extend}
+                'x': extend}"""
 
 ITEM_TYPES = {
 	'a': ASSESSMENT, 'assessment': ASSESSMENT,
