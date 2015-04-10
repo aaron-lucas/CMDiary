@@ -9,6 +9,7 @@ from DiaryEntry import ASSESSMENT, HOMEWORK, NOTE, UID, ITEM_TYPE, SUBJECT, DESC
 from Diary import Diary
 from termcolor import cprint, colored
 import re
+from tabulate import tabulate
 import datetime
 from collections import OrderedDict
 from ParameterInfo import ParameterInfo
@@ -16,6 +17,10 @@ from ParameterInfo import ParameterInfo
 ATTRIBUTE = 'attribute'
 VALUE = 'value' # Changes depending on chosen attribute - used in edit()
 DAYS = 'days' # days parameter name/reference
+
+COLOR_MAP = {ASSESSMENT: 'red',
+             HOMEWORK: 'blue',
+             NOTE: 'green'}
 
 def requires_parameters(*params):
 	def decorator(func):
@@ -99,8 +104,22 @@ def extend(input_data, required_data):
 
 	diary.extend(required_data[DAYS], required_data[UID])
 
-def list_items():
-	pass
+def display():
+	headers = ('UID', 'Type', 'Subject', 'Description', 'Due Date', 'Days Left')
+	rows = []
+	for entry in diary.entries:
+		rows.append([str(entry.uid),
+		             entry.item_type,
+		             entry.subject,
+		             entry.description,
+		             date_to_str(entry.due_date),
+		             str(entry.days_left)])
+	rows = [[colored(attr, COLOR_MAP[row[1]]) for attr in row] for row in rows]
+
+	#sorted(rows, lambda r: r[-1]) # Sort by days remaining
+
+	print(tabulate(rows, headers))
+	print()
 
 def determine_date_separator(string):
 	if not string:
@@ -123,8 +142,8 @@ def str_to_date(string):
 
 	return datetime.date(year, month, day)
 
-def date_to_str():
-	pass
+def date_to_str(date):
+	return date.strftime('%d/%m/%Y')
 
 def validate_date(string):
 	try:
@@ -169,9 +188,15 @@ def format_existing_data(data):
 
 def prompt():
 	inp = input('CMDiary {}> '.format(VERSION))
+	if not inp:
+		return (None, '')
 	split_input = inp.split(maxsplit=1)
 	command = split_input[0]
-	command = COMMANDS.get(command, None)
+	try:
+		command = COMMANDS[command]
+	except IndexError:
+		cprint('{} is not a valid command'.format(command), 'yellow')
+		return (None, '')
 	args = split_input[1] if len(split_input) == 2 else ''
 	return command, args
 
@@ -234,15 +259,14 @@ COMMANDS = {'add': add, 'a': add,
             'edit': edit, 'e': edit,
             'extend': extend, 'x': extend,
             'quit': quit, 'q': quit,
-            'list': list_items, 'l': list_items()}
-
-
+            'list': display, 'l': display}
 
 # Run the diary
 if __name__ == '__main__':
+	display()
 	while True:
 		command, args = prompt()
 		if command is None:
-			cprint('{} is not a valid command'.format(command), 'yellow')
 			continue
+
 		command(args)

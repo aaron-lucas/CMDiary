@@ -65,4 +65,4 @@ class DiaryEntry(object):
 	def days_left(self):
 		if self.due_date is None:
 			return None
-		return (self.due_date.date - datetime.date.today()).days()
+		return (self.due_date - datetime.date.today()).days
