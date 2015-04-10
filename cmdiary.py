@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 diary = Diary()
 
-def get_input(prompt, response_type=str, condition=None, modifier=None):
+def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg='Invalid Argument'):
 	while True:
 		inp = input(prompt)
 		try:
@@ -18,7 +18,10 @@ def get_input(prompt, response_type=str, condition=None, modifier=None):
 		else:
 			if condition is None or condition(inp):
 				return inp if modifier is None else modifier(inp)
-			cprint('Input must pass specified condition', 'yellow')
+
+			if '{}' in err_msg:
+				err_msg = err_msg.format(inp)
+			cprint(err_msg, 'yellow')
 
 def format_input(input_string):
 	pass
@@ -28,9 +31,11 @@ def add(input_data):
 	                             (SUBJECT, False),
 	                             (DESCRIPTION, False),
 	                             (DUE_DATE, False)])
-
-	required_data[ITEM_TYPE] = list(input_data.split())[:1]
-	required_data[SUBJECT] = list(input_data.split())[1:2]
+	try:
+		required_data[ITEM_TYPE] = list(input_data.split())[0]
+		required_data[SUBJECT] = list(input_data.split())[1]
+	except IndexError:
+		pass
 
 	unparsed_data = ' '.join(input_data.split()[2:])
 	re_due_date = re.compile(r' (([0-9]{1,2} ?){1,2}([0-9]{4})?)$')
@@ -56,7 +61,13 @@ def extend(input_data):
 def list_items():
 	pass
 
-def str_to_date(string, separator='/'):
+def determine_date_separator(string):
+	for separator in (' ', '/', '-'):
+		if separator in string:
+			return separator
+
+def str_to_date(string):
+	separator = determine_date_separator(string)
 	if not string:
 		return None
 	components = string.split(separator)
@@ -71,14 +82,32 @@ def str_to_date(string, separator='/'):
 def date_to_str():
 	pass
 
+def validate_date(string):
+	separator = determine_date_separator(string)
+
+	try:
+		test_date = str_to_date(string, separator)
+	except ValueError:
+		return False
+
+	return True
+
+
 def complete_data(data):
 	for key, value in data.items():
 		if value:
 			continue
-		label = key.replace('_', ' ') + ': '
-		data[key] = input(label)
+		if key == UID:
+			data[key] = get_input('UID: ', int, condition=lambda uid: uid in diary.taken_uids, err_msg='Object with UID {} does not exist')
+		elif key == ITEM_TYPE:
+			data[key] = get_input('Item type: ', condition=lambda x: x in ITEM_TYPES.keys())
+		elif key in (SUBJECT, DESCRIPTION):
+			data[key] = get_input(key.capitalize()+': ')
+		elif key == DUE_DATE:
+			data[key] = get_input('Due date: ', str, condition=validate_date, modifier=str_to_date)
+
 def format_data(data):
-	for key, value in data.items:
+	for key, value in data.items():
 		if key in (SUBJECT, DESCRIPTION):
 			if value in (False, None):
 				value = None
