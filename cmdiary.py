@@ -128,7 +128,7 @@ def extend(input_data, required_data):
     diary.extend(required_data[DAYS], required_data[UID])
 
 
-def display(filter=None):  # Filter not yet implemented
+def display(filter_=None):  # Filter not yet implemented
     os.system('cls' if os.name == 'nt' else 'clear')
     if not len(diary.entries):
         cprint('Diary has no entries.\n', 'yellow')
@@ -241,16 +241,16 @@ def format_existing_data(data):
 def prompt():
     inp = input('CMDiary {}> '.format(VERSION))
     if not inp:
-        return (None, '')
+        return None, ''
     split_input = inp.split(maxsplit=1)
-    command = split_input[0]
+    command_str = split_input[0]
     try:
-        command = COMMANDS[command]
+        command_str = COMMANDS[command_str]
     except KeyError:
-        cprint("'{}' is not a valid command".format(command), 'yellow')
-        return (None, '')
-    args = split_input[1] if len(split_input) == 2 else ''
-    return command, args
+        cprint("'{}' is not a valid command".format(command_str), 'yellow')
+        return None, ''
+    arg_string = split_input[1] if len(split_input) == 2 else ''
+    return command_str, arg_string
 
 
 diary = Diary()
