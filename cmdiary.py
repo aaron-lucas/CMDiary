@@ -117,10 +117,8 @@ def extend(input_data, required_data):
 
 	diary.extend(required_data[DAYS], required_data[UID])
 
-def display(filter=None, title=''): # Filter not yet implemented
+def display(filter=None): # Filter not yet implemented
 	os.system('cls' if os.name == 'nt' else 'clear')
-	if title:
-		print(title)
 	if not len(diary.entries):
 		cprint('Diary has no entries.\n', 'yellow')
 		return
@@ -299,7 +297,7 @@ COMMANDS = {'add': add, 'a': add,
 
 # Run the diary
 if __name__ == '__main__':
-	display(title='Welcome to CMDiary\n')
+	display()
 	while True:
 		command, args = prompt()
 		if command is None:
