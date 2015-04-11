@@ -1,4 +1,5 @@
-# Database files
+# Data files
+*.pickle
 *.db
 *.pickle
 
