@@ -4,7 +4,10 @@ VERSION = 'v2.0'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
-import datetime, re, os, sys
+import datetime
+import re
+import os
+import sys
 from collections import OrderedDict
 
 from termcolor import cprint, colored
@@ -15,10 +18,11 @@ from Diary import Diary
 from ParameterInfo import ParameterInfo
 from info import get_info
 
+
 ATTRIBUTE = 'attribute'
 VALUE = 'value'  # Changes depending on chosen attribute - used in edit()
 DAYS = 'days'  # days parameter name/reference
-NEW_UID = 'new_uid' # Parameter name requiring nonexistent uid
+NEW_UID = 'new_uid'  # Parameter name requiring nonexistent uid
 
 COLOUR_MAP = {ASSESSMENT: 'red',
               HOMEWORK: 'blue',
@@ -199,7 +203,7 @@ def date_to_str(date):
 
 def validate_date(string):
     try:
-        _test_date = str_to_date(string)
+        _ = str_to_date(string)  # If fails, then invalid date
     except ValueError:
         return False
     return True
@@ -221,6 +225,7 @@ def complete_data(data):
                               modifier=param_info.modifier,
                               err_msg=param_info.err_msg)
 
+
 def format_existing_data(data):
     for key, value in data.items():
         if not value:
@@ -238,12 +243,14 @@ def format_existing_data(data):
                 continue
         data[key] = False  # Mark data as invalid by resetting value
 
+
 def match_value_parameter(data):
     if data.get(ATTRIBUTE, False):
         i_value = PARAMETERS[ATTRIBUTES[data[ATTRIBUTE]]]  # Match parameter to data value
         if i_value == i_uid:
-                i_value = i_new_uid  # Only occurs when a value is changed, so need i_new_uid
+            i_value = i_new_uid  # Only occurs when a value is changed, so need i_new_uid
         return i_value
+
 
 def prompt():
     inp = input('CMDiary {}> '.format(VERSION))
@@ -271,7 +278,7 @@ i_uid = ParameterInfo(UID,
 
 i_new_uid = ParameterInfo(NEW_UID,
                           int,
-                          condition=lambda uid:uid not in diary.taken_uids,
+                          condition=lambda uid: uid not in diary.taken_uids,
                           err_msg='Object with UID {} already exists')
 
 i_item_type = ParameterInfo(ITEM_TYPE,

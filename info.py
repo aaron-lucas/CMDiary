@@ -21,6 +21,7 @@ DATE_FORMATTING = '* Dates can be represented by using 1 to 3 numbers, separated
                   '* If a year is specified, it must be in full, 4-digit format or it will not be recognised.'
 date_formatting_help = 'Date formatting:\n{}'.format(DATE_FORMATTING)
 
+
 def get_info(item=None):
     if item is None:
         print('\nCMDiary Help\n-----------------------')
@@ -42,4 +43,3 @@ def get_info(item=None):
     else:
         cprint("No help section for '{}'. Type 'help' for all CMDiary help info.".format(item), 'yellow')
     print()
-

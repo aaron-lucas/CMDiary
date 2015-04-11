@@ -5,4 +5,3 @@ class ParameterInfo(object):
         self.condition = condition
         self.modifier = modifier
         self.err_msg = err_msg
-
