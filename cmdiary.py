@@ -4,23 +4,25 @@ VERSION = 'v2.0'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
+import datetime, re, os, sys
+from collections import OrderedDict
+
+from termcolor import cprint, colored
+from tabulate import tabulate
 
 from DiaryEntry import ASSESSMENT, HOMEWORK, NOTE, UID, ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE
 from Diary import Diary
-from termcolor import cprint, colored
-import re
-from tabulate import tabulate
-import datetime
-from collections import OrderedDict
 from ParameterInfo import ParameterInfo
 
 ATTRIBUTE = 'attribute'
 VALUE = 'value' # Changes depending on chosen attribute - used in edit()
 DAYS = 'days' # days parameter name/reference
 
-COLOR_MAP = {ASSESSMENT: 'red',
-             HOMEWORK: 'blue',
-             NOTE: 'green'}
+COLOUR_MAP = {ASSESSMENT: 'red',
+              HOMEWORK: 'blue',
+              NOTE: 'green'}
+
+NO_DATE = 'N/A'
 
 def requires_parameters(*params):
 	def decorator(func):
@@ -29,6 +31,13 @@ def requires_parameters(*params):
 			return func(input_data, required_data)
 		return wrapper
 	return decorator
+
+def update(func):
+	def wrapper(*args, **kwargs):
+		retval = func(*args, **kwargs)
+		display()
+		return retval
+	return wrapper
 
 def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg='Invalid Argument'):
 	while True:
@@ -45,6 +54,7 @@ def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg=
 			message = err_msg.format(inp) if '{}' in err_msg else err_msg
 			cprint(message, 'yellow')
 
+@update
 @requires_parameters(ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE)
 def add(input_data, required_data):
 	try:
@@ -65,6 +75,7 @@ def add(input_data, required_data):
 
 	diary.add(**required_data)
 
+@update
 @requires_parameters(UID)
 def remove(input_data, required_data):
 	try:
@@ -77,6 +88,7 @@ def remove(input_data, required_data):
 
 	diary.remove(required_data[UID])
 
+@update
 @requires_parameters(UID, ATTRIBUTE, VALUE)
 def edit(input_data, required_data):
 	try:
@@ -91,6 +103,7 @@ def edit(input_data, required_data):
 
 	diary.edit(required_data[ATTRIBUTE], required_data[VALUE], required_data[UID])
 
+@update
 @requires_parameters(UID, DAYS)
 def extend(input_data, required_data):
 	try:
@@ -104,22 +117,25 @@ def extend(input_data, required_data):
 
 	diary.extend(required_data[DAYS], required_data[UID])
 
-def display():
+def display(filter=None): # Filter not yet implemented
+	os.system('cls' if os.name == 'nt' else 'clear')
 	headers = ('UID', 'Type', 'Subject', 'Description', 'Due Date', 'Days Left')
 	rows = []
 	for entry in diary.entries:
+		due_date = entry.due_date if entry.due_date is not None else NO_DATE
+		days_left = entry.days_left if entry.days_left is not None else NO_DATE
 		rows.append([str(entry.uid),
 		             entry.item_type,
 		             entry.subject,
 		             entry.description,
-		             date_to_str(entry.due_date),
-		             str(entry.days_left)])
-	rows = [[colored(attr, COLOR_MAP[row[1]]) for attr in row] for row in rows]
+		             date_to_str(due_date),
+		             str(days_left)])
 
-	#sorted(rows, lambda r: r[-1]) # Sort by days remaining
-
-	print(tabulate(rows, headers))
-	print()
+	rows.sort(key=lambda r: r[-1]) # Sort by days remaining
+	rows = [[colored(attr, COLOUR_MAP[row[1]]) for attr in row] for row in rows] # Colour-code rows based on item type
+	table = tabulate(rows, headers)
+	sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=24, cols=max((len(table.split('\n')[1])), 80))) # Resize window
+	print(table + '\n')
 
 def determine_date_separator(string):
 	if not string:
@@ -143,7 +159,7 @@ def str_to_date(string):
 	return datetime.date(year, month, day)
 
 def date_to_str(date):
-	return date.strftime('%d/%m/%Y')
+	return date.strftime('%d/%m/%Y') if date is not NO_DATE else NO_DATE
 
 def validate_date(string):
 	try:
