@@ -117,8 +117,13 @@ def extend(input_data, required_data):
 
 	diary.extend(required_data[DAYS], required_data[UID])
 
-def display(filter=None): # Filter not yet implemented
+def display(filter=None, title=''): # Filter not yet implemented
 	os.system('cls' if os.name == 'nt' else 'clear')
+	if title:
+		print(title)
+	if not len(diary.entries):
+		cprint('Diary has no entries.\n', 'yellow')
+		return
 	headers = ('UID', 'Type', 'Subject', 'Description', 'Due Date', 'Days Left')
 	rows = []
 	for entry in diary.entries:
@@ -132,10 +137,25 @@ def display(filter=None): # Filter not yet implemented
 		             str(days_left)])
 
 	rows.sort(key=lambda r: r[-1]) # Sort by days remaining
-	rows = [[colored(attr, COLOUR_MAP[row[1]]) for attr in row] for row in rows] # Colour-code rows based on item type
+	rows = [[colored(attr, COLOUR_MAP[row[1]], attrs=get_text_attributes(row)) for attr in row]
+	        for row in rows] # Colour-code rows based on item type
 	table = tabulate(rows, headers)
-	sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=24, cols=max((len(table.split('\n')[1])), 80))) # Resize window
+	sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=24,
+	                                                cols=max((len(table.split('\n')[1])), 80))) # Resize window
 	print(table + '\n')
+
+def get_text_attributes(row_data):
+	attrs = []
+	days_left = row_data[-1]
+	if days_left != NO_DATE:
+		days_left = int(days_left)
+		if days_left < 0:
+			attrs.append('dark')
+		if days_left == 0:
+			attrs.append('reverse')
+		if days_left == 1:
+			attrs.append('underline')
+	return attrs
 
 def determine_date_separator(string):
 	if not string:
@@ -279,7 +299,7 @@ COMMANDS = {'add': add, 'a': add,
 
 # Run the diary
 if __name__ == '__main__':
-	display()
+	display(title='Welcome to CMDiary\n')
 	while True:
 		command, args = prompt()
 		if command is None:
