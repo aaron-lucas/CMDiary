@@ -13,10 +13,12 @@ from tabulate import tabulate
 from DiaryEntry import ASSESSMENT, HOMEWORK, NOTE, UID, ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE
 from Diary import Diary
 from ParameterInfo import ParameterInfo
+from info import get_info
 
 ATTRIBUTE = 'attribute'
 VALUE = 'value'  # Changes depending on chosen attribute - used in edit()
 DAYS = 'days'  # days parameter name/reference
+NEW_UID = 'new_uid' # Parameter name requiring nonexistent uid
 
 COLOUR_MAP = {ASSESSMENT: 'red',
               HOMEWORK: 'blue',
@@ -207,8 +209,8 @@ def complete_data(data):
     for key, value in data.items():
         if value:
             continue  # Data is already present
-        if data.get(ATTRIBUTE, False):
-            i_value = PARAMETERS[ATTRIBUTES[data[ATTRIBUTE]]]
+        if ATTRIBUTE in data.keys():
+            i_value = match_value_parameter(data)
         label = key.capitalize().replace('_', ' ') + ': '
 
         param_info = PARAMETERS[key] if key != VALUE else i_value
@@ -219,13 +221,12 @@ def complete_data(data):
                               modifier=param_info.modifier,
                               err_msg=param_info.err_msg)
 
-
 def format_existing_data(data):
     for key, value in data.items():
         if not value:
             continue
-        if data.get(ATTRIBUTE, False):
-            i_value = PARAMETERS[ATTRIBUTES[data[ATTRIBUTE]]]
+        if ATTRIBUTE in data.keys():
+            i_value = match_value_parameter(data)
         param_info = PARAMETERS[key] if key != VALUE else i_value
         try:
             value = param_info.data_type(value)
@@ -237,6 +238,12 @@ def format_existing_data(data):
                 continue
         data[key] = False  # Mark data as invalid by resetting value
 
+def match_value_parameter(data):
+    if data.get(ATTRIBUTE, False):
+        i_value = PARAMETERS[ATTRIBUTES[data[ATTRIBUTE]]]  # Match parameter to data value
+        if i_value == i_uid:
+                i_value = i_new_uid  # Only occurs when a value is changed, so need i_new_uid
+        return i_value
 
 def prompt():
     inp = input('CMDiary {}> '.format(VERSION))
@@ -262,6 +269,11 @@ i_uid = ParameterInfo(UID,
                       condition=lambda uid: int(uid) in diary.taken_uids,
                       err_msg='Object with UID {} does not exist')
 
+i_new_uid = ParameterInfo(NEW_UID,
+                          int,
+                          condition=lambda uid:uid not in diary.taken_uids,
+                          err_msg='Object with UID {} already exists')
+
 i_item_type = ParameterInfo(ITEM_TYPE,
                             condition=lambda x: x in ITEM_TYPES.keys(),
                             modifier=lambda x: ITEM_TYPES.get(x, HOMEWORK),
@@ -286,8 +298,8 @@ i_days = ParameterInfo(DAYS,
 RE_DUE_DATE = re.compile(r' (([0-9]{1,2} ?){1,2}([0-9]{4})?)$')
 
 # Define dicts of possible inputs and abbreviations
-
 PARAMETERS = {UID: i_uid,
+              NEW_UID: i_new_uid,
               ITEM_TYPE: i_item_type,
               SUBJECT: i_subject,
               DESCRIPTION: i_description,
@@ -296,10 +308,10 @@ PARAMETERS = {UID: i_uid,
               DAYS: i_days}
 
 ATTRIBUTES = ({'u': UID, UID: UID,
-               'i': ITEM_TYPE, ITEM_TYPE: ITEM_TYPE,
+               't': ITEM_TYPE, 'type': ITEM_TYPE,
                's': SUBJECT, SUBJECT: SUBJECT,
                'd': DESCRIPTION, DESCRIPTION: DESCRIPTION,
-               'due': DUE_DATE, DUE_DATE: DUE_DATE})
+               'due': DUE_DATE, 'duedate': DUE_DATE})
 
 ITEM_TYPES = {
     'a': ASSESSMENT, 'assessment': ASSESSMENT,
@@ -312,7 +324,8 @@ COMMANDS = {'add': add, 'a': add,
             'edit': edit, 'e': edit,
             'extend': extend, 'x': extend,
             'quit': quit, 'q': quit,
-            'list': display, 'l': display}
+            'list': display, 'l': display,
+            'help': get_info, 'h': get_info}
 
 # Run the diary
 if __name__ == '__main__':
@@ -321,5 +334,6 @@ if __name__ == '__main__':
         command, args = prompt()
         if command is None:
             continue
-
+        if command is get_info:
+            args = args if args else None
         command(args)
