@@ -1,6 +1,6 @@
 # CMDiary - a command-line diary application
 
-VERSION = 'v2.0.1'
+VERSION = 'v2.0.2'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 

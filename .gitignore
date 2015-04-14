@@ -1,7 +1,5 @@
 # Data files
 *.pickle
-*.db
-*.pickle
 
 # __pycache__ directory
 __pycache__/
@@ -9,5 +7,5 @@ __pycache__/
 # PyCharm Project Settings
 .idea/
 
-#OS X .DS_Store file
-.DS_Store
+# TODO file for updates
+update_todos.txt
