@@ -1,6 +1,6 @@
 # CMDiary - a command-line diary application
 
-VERSION = 'v2.0'
+VERSION = 'v2.0.1'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
@@ -57,6 +57,8 @@ def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg=
         try:
             if inp:
                 inp = response_type(inp)
+            else:
+                continue
         except:
             cprint('Input must be of type {}'.format(response_type.__name__), 'yellow')
         else:
@@ -114,8 +116,8 @@ def edit(input_data, required_data):
         pass
 
     format_existing_data(required_data)
-    complete_data(required_data)
-
+    if any([not bool(val) for val in required_data.values()]):
+        complete_data(required_data)
     diary.edit(required_data[ATTRIBUTE], required_data[VALUE], required_data[UID])
 
 
@@ -218,7 +220,6 @@ def complete_data(data):
         label = key.capitalize().replace('_', ' ') + ': '
 
         param_info = PARAMETERS[key] if key != VALUE else i_value
-
         data[key] = get_input(prompt=label,
                               response_type=param_info.data_type,
                               condition=param_info.condition,
@@ -246,9 +247,10 @@ def format_existing_data(data):
 
 def match_value_parameter(data):
     if data.get(ATTRIBUTE, False):
-        i_value = PARAMETERS[ATTRIBUTES[data[ATTRIBUTE]]]  # Match parameter to data value
-        if i_value == i_uid:
-            i_value = i_new_uid  # Only occurs when a value is changed, so need i_new_uid
+        if data[ATTRIBUTE] == UID:
+            i_value = i_new_uid
+        else:
+            i_value = PARAMETERS[ATTRIBUTES[data[ATTRIBUTE]]]  # Match parameter to data value
         return i_value
 
 
@@ -278,13 +280,14 @@ i_uid = ParameterInfo(UID,
 
 i_new_uid = ParameterInfo(NEW_UID,
                           int,
-                          condition=lambda uid: uid not in diary.taken_uids,
-                          err_msg='Object with UID {} already exists')
+                          condition=lambda uid: (uid not in diary.taken_uids) and (uid in range(1, 1000)),
+                          err_msg='Object with UID {} already exists or invalid uid (must be between 1 and 999)')
 
 i_item_type = ParameterInfo(ITEM_TYPE,
                             condition=lambda x: x in ITEM_TYPES.keys(),
                             modifier=lambda x: ITEM_TYPES.get(x, HOMEWORK),
-                            err_msg="Item type '{}' does not exist")
+                            err_msg="Item type '{}' does not exist. Available item types are "
+                                    "assessment, homework and note.")
 
 i_subject = ParameterInfo(SUBJECT)
 
@@ -293,11 +296,13 @@ i_description = ParameterInfo(DESCRIPTION)
 i_due_date = ParameterInfo(DUE_DATE,
                            condition=validate_date,
                            modifier=str_to_date,
-                           err_msg='Invalid date. Date format is dd/mm/yyyy. See help page for more info.')
+                           err_msg="Invalid date. Date format is dd/mm/yyyy. See help page or type 'help date' "
+                                   "for more info.")
 i_attr = ParameterInfo(ATTRIBUTE,
                        condition=lambda attr: attr in ATTRIBUTES,
                        modifier=lambda attr: ATTRIBUTES[attr],
-                       err_msg="Attribute '{}' does not exist")
+                       err_msg="Attribute '{}' does not exist. Available attributes are type, subject, "
+                               "description and duedate.")
 i_days = ParameterInfo(DAYS,
                        int)
 
@@ -315,7 +320,7 @@ PARAMETERS = {UID: i_uid,
               DAYS: i_days}
 
 ATTRIBUTES = ({'u': UID, UID: UID,
-               't': ITEM_TYPE, 'type': ITEM_TYPE,
+               't': ITEM_TYPE, 'type': ITEM_TYPE, ITEM_TYPE: ITEM_TYPE,
                's': SUBJECT, SUBJECT: SUBJECT,
                'd': DESCRIPTION, DESCRIPTION: DESCRIPTION,
                'due': DUE_DATE, 'duedate': DUE_DATE})
@@ -337,10 +342,13 @@ COMMANDS = {'add': add, 'a': add,
 # Run the diary
 if __name__ == '__main__':
     display()
-    while True:
-        command, args = prompt()
-        if command is None:
-            continue
-        if command is get_info:
-            args = args if args else None
-        command(args)
+    try:
+        while True:
+            command, args = prompt()
+            if command is None:
+                continue
+            if command is get_info:
+                args = args if args else None
+            command(args)
+    except KeyboardInterrupt:
+        quit()
