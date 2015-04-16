@@ -1,0 +1,22 @@
+v2.0.2:
+--------
+*   Add changelog.txt and todo.txt
+*   Fix bugs relating to data input
+
+v2.0.1:
+--------
+*   Includes more descriptive help messages
+*   Minor bug fixes
+
+v2.0:
+------
+*   Complete rebuild of CMDiary with greater efficiency, ease of use and maintainable code.
+*   No feature changes but changed internal mechanisms of the diary
+
+v1.0.1:
+--------
+*   Minor bug fixes
+
+v1.0:
+------
+*   Initial release

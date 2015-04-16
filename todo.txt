@@ -1,0 +1,31 @@
+TODO FILE
+
+-------------------------------------------------------------------------------------------------
+| F     = New feature           | ?     = May implement         | [X]   = Will not implement    |
+| U     = Update old feature    | !     = High priority         | [P]   = Partially completed   |
+| B     = Bugfix                |                               | [C]   = Completed             |
+| *     = Other                 |                               | [#]   = For every version     |
+-------------------------------------------------------------------------------------------------
+
+Every Version:
+---------------
+*       Update version number                                                   [#]
+*       Update changelog.txt                                                    [#]
+
+Current Update:
+v2.0.2:
+--------
+*       Add comments and docstrings                                             []
+B       Allow blank fields when entering data                                   [C]
+B!      Fix crash when editing due date                                         [C]
+*       Add todo.txt and changelog.txt                                          [C]
+
+Future Updates:
+v2.1:
+------
+F?      Undo Feature                                                            []
+F?      Priority feature which highlights important entries                     []
+*?      Write tests                                                             []
+
+Old Updates:
+** todo.txt did not exist before version 2.0.2 **

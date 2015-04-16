@@ -55,18 +55,21 @@ def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg=
     while True:
         inp = input(prompt)
         try:
-            if inp:
+            if inp or inp == '':
                 inp = response_type(inp)
             else:
                 continue
         except:
-            cprint('Input must be of type {}'.format(response_type.__name__), 'yellow')
+            print_error_message(err_msg, inp)
         else:
             if condition is None or condition(inp):
                 return inp if modifier is None else modifier(inp)
+            print_error_message(err_msg, inp)
 
-            message = err_msg.format(inp) if '{}' in err_msg else err_msg
-            cprint(message, 'yellow')
+
+def print_error_message(msg_template, inp):
+    message = msg_template.format(inp)
+    cprint(message, 'yellow')
 
 
 @update
@@ -323,7 +326,7 @@ ATTRIBUTES = ({'u': UID, UID: UID,
                't': ITEM_TYPE, 'type': ITEM_TYPE, ITEM_TYPE: ITEM_TYPE,
                's': SUBJECT, SUBJECT: SUBJECT,
                'd': DESCRIPTION, DESCRIPTION: DESCRIPTION,
-               'due': DUE_DATE, 'duedate': DUE_DATE})
+               'due': DUE_DATE, 'duedate': DUE_DATE, DUE_DATE: DUE_DATE})
 
 ITEM_TYPES = {
     'a': ASSESSMENT, 'assessment': ASSESSMENT,

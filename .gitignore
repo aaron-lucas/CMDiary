@@ -6,6 +6,3 @@ __pycache__/
 
 # PyCharm Project Settings
 .idea/
-
-# TODO file for updates
-update_todos.txt
