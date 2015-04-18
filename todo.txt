@@ -15,16 +15,24 @@ Every Version:
 Current Update:
 v2.0.2:
 --------
-*       Add comments and docstrings                                             []
+*       Add comments and docstrings                                             [C]
 B       Allow blank fields when entering data                                   [C]
 B!      Fix crash when editing due date                                         [C]
 *       Add todo.txt and changelog.txt                                          [C]
+B!      Make colours work on windows (using colorama)                           [C]
 
 Future Updates:
+v2.0.3:
+--------
+*       Improve code efficiency by adding to requires_parameters decorator      []
+
+
 v2.1:
 ------
 F?      Undo Feature                                                            []
-F?      Priority feature which highlights important entries                     []
+F?      Filter feature to select multiple entries at once                       []
+F       Priority feature which highlights important entries                     []
+F       Allow scheduling of tasks                                               []
 *?      Write tests                                                             []
 
 Old Updates:

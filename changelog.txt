@@ -2,6 +2,8 @@ v2.0.2:
 --------
 *   Add changelog.txt and todo.txt
 *   Fix bugs relating to data input
+*   Add docstrings and comments throughout code
+*   Windows machines now print coloured text instead of gibberish
 
 v2.0.1:
 --------
@@ -10,7 +12,7 @@ v2.0.1:
 
 v2.0:
 ------
-*   Complete rebuild of CMDiary with greater efficiency, ease of use and maintainable code.
+*   Complete rebuild of CMDiary with greater efficiency, ease of use and maintainable code
 *   No feature changes but changed internal mechanisms of the diary
 
 v1.0.1:
