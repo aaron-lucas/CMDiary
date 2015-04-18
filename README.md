@@ -9,6 +9,7 @@
 
 ###Installing Python Modules
 _Note: if multiple versions of Python are installed on your system, the command `pip3` may have to be used instead of `pip`_
+
 Use [`pip`](https://pip.pypa.io/en/latest/index.html), Python's package manager to install `tabulate` and `termcolor` with the following commands:
 ```
 pip install tabulate
