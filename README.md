@@ -5,7 +5,7 @@
 - [Python 3](python.org) or greater
 - [tabulate module](https://pypi.python.org/pypi/tabulate)
 - [termcolor module](https://pypi.python.org/pypi/termcolor)
-- [colorama module](https://pypi.python.org/pypi/colorama) (*Windows only*)
+- [colorama module](https://pypi.python.org/pypi/colorama) (**Windows only**)
 
 ###Installing Python Modules
 _Note: if multiple versions of Python are installed on your system, the command `pip3` may have to be used instead of `pip`_
@@ -15,7 +15,7 @@ pip install tabulate
 pip install termcolor
 ```
 
-*Windows users*
+####Windows users
 After completing the above steps, use the same method to install the `colorama` module:
 ```
 pip install colorama
