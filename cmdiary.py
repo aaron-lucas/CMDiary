@@ -12,6 +12,8 @@ from collections import OrderedDict
 
 from termcolor import cprint, colored
 from tabulate import tabulate
+if os.name == 'nt':  # Colorama only required on Windows machines
+    from colorama import init, deinit
 
 from DiaryEntry import ASSESSMENT, HOMEWORK, NOTE, UID, ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE
 from Diary import Diary
@@ -398,6 +400,13 @@ def prompt():
     arg_string = split_input[1] if len(split_input) == 2 else ''  # Check is arguments were supplied
     return command_str, arg_string
 
+
+def quit_cmdiary():
+    """Clean up and quit diary."""
+    if os.name == 'nt':  # Colorama only required on Windows machines
+        deinit()  # Colorama deinit function
+    quit()
+
 # Initialise diary object
 diary = Diary()
 
@@ -468,12 +477,14 @@ COMMANDS = {'add': add, 'a': add,
             'remove': remove, 'r': remove,
             'edit': edit, 'e': edit,
             'extend': extend, 'x': extend,
-            'quit': quit, 'q': quit,
+            'quit': quit_cmdiary, 'q': quit_cmdiary,
             'list': display, 'l': display,
             'help': get_info, 'h': get_info}
 
 # Run the diary
 if __name__ == '__main__':
+    if os.name == 'nt':  # Colorama only required on Windows machines
+        init()  # Colorama init function -- allows coloured text on Windows machines
     display()
     try:
         while True:
@@ -484,4 +495,4 @@ if __name__ == '__main__':
                 args = args if args else None  # get_info has slightly different parameter requirements
             command(args)
     except KeyboardInterrupt:
-        quit()  # Exit without crash info
+        quit_cmdiary()  # Exit without crash info
