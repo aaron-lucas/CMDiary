@@ -262,7 +262,7 @@ def get_text_attributes(row_data):
         if days_left == 0:
             attrs.append('reverse')
         if days_left == 1:
-            attrs.append('underline')
+            attrs.append('bold')
     return attrs
 
 
@@ -302,7 +302,7 @@ def str_to_date(string):
 
 def date_to_str(date):
     """Convert a date to a string with a pre-determined format."""
-    return date.strftime('%d/%m/%Y') if date is not NO_DATE else NO_DATE
+    return date.strftime('%d/%m/%Y') if date not in (NO_DATE, None) else NO_DATE
 
 
 def validate_date(string):
@@ -353,6 +353,9 @@ def format_existing_data(data):
             continue  # No value to be formatted
         if ATTRIBUTE in data.keys():  # User wishes to edit an entry
             i_value = match_value_parameter(data)
+            if i_value is None:  # Invalid attribute name passed
+                data[ATTRIBUTE] = False
+                continue
         param_info = PARAMETERS[key] if key != VALUE else i_value  # Get info about required data
 
         # Format value
@@ -377,7 +380,7 @@ def match_value_parameter(data):
         if data[ATTRIBUTE] == UID:
             i_value = i_new_uid  # The attribute argument is only used in `edit` so a new uid should be specified
         else:
-            i_value = PARAMETERS[ATTRIBUTES[data[ATTRIBUTE]]]  # Match parameter to data value
+            i_value = PARAMETERS.get(ATTRIBUTES.get(data[ATTRIBUTE], None), None)  # Match parameter to data value
         return i_value
 
 

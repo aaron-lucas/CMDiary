@@ -1,3 +1,8 @@
+v2.0.3:
+--------
+*   Change underlining of entries with 1 day left to making them bold
+*   Fix bug that caused a crash
+
 v2.0.2:
 --------
 *   Add changelog.txt and todo.txt
