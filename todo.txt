@@ -15,9 +15,9 @@ Every Version:
 Current Update:
 v2.0.3:
 --------
-*       Improve code efficiency by adding to requires_parameters decorator      []
+*       Improve code efficiency by adding to requires_parameters decorator      [X]
 B!      Providing nonexistent attribute when editing causes crash               [C]
-U       Underline instead of bold entries die in 1 day                          [C]
+U       Underline instead of bold entries due in 1 day                          [C]
 
 Future Updates:
 v2.1:

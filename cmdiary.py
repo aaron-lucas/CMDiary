@@ -1,6 +1,6 @@
 # CMDiary - a command-line diary application
 
-VERSION = 'v2.0.2'
+VERSION = 'v2.0.3'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
@@ -329,11 +329,11 @@ def complete_data(data):
     for key, value in data.items():
         if value:
             continue  # Data is already present
-        if ATTRIBUTE in data.keys():  # User wishes to edit an entry
+        if key == ATTRIBUTE:  # `edit` function is running
             i_value = match_value_parameter(data)
         label = key.capitalize().replace('_', ' ') + ': '  # Change data name to readable label
 
-        param_info = PARAMETERS[key] if key != VALUE else i_value  # Get info about required data
+        param_info = PARAMETERS[key] if key != VALUE else i_value  # ATTRIBUTE comes before VALUE
         data[key] = get_input(prompt=label,
                               response_type=param_info.data_type,
                               condition=param_info.condition,
@@ -351,13 +351,12 @@ def format_existing_data(data):
     for key, value in data.items():
         if not value:
             continue  # No value to be formatted
-        if ATTRIBUTE in data.keys():  # User wishes to edit an entry
+        if key == ATTRIBUTE:  # `edit` function is running
             i_value = match_value_parameter(data)
             if i_value is None:  # Invalid attribute name passed
                 data[ATTRIBUTE] = False
-                continue
-        param_info = PARAMETERS[key] if key != VALUE else i_value  # Get info about required data
-
+                break  # Continuing loop with no attribute causes crash as no parameter info exists for the new value
+        param_info = PARAMETERS.get(key, None) if key != VALUE else i_value  # ATTRIBUTE comes before VALUE
         # Format value
         try:
             value = param_info.data_type(value)
