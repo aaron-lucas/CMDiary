@@ -13,11 +13,9 @@ Every Version:
 *       Update changelog.txt                                                    [#]
 
 Current Update:
-v2.0.3:
+v2.0.4:
 --------
-*       Improve code efficiency by adding to requires_parameters decorator      [X]
-B!      Providing nonexistent attribute when editing causes crash               [C]
-U       Underline instead of bold entries due in 1 day                          [C]
+B!      Not specifying an int when extending causes crash                       [C]
 
 Future Updates:
 v2.1:
@@ -30,6 +28,12 @@ UF      Allow custom types and colours                                          
 *?      Write tests                                                             []
 
 Old Updates:
+v2.0.3:
+--------
+*       Improve code efficiency by adding to requires_parameters decorator      [X]
+B!      Providing nonexistent attribute when editing causes crash               [C]
+U       Underline instead of bold entries due in 1 day                          [C]
+
 v2.0.2:
 --------
 *       Add comments and docstrings                                             [C]

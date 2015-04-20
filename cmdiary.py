@@ -1,6 +1,6 @@
 # CMDiary - a command-line diary application
 
-VERSION = 'v2.0.3'
+VERSION = 'v2.0.4'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
@@ -86,7 +86,7 @@ def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg=
         try:
             if inp or inp == '':  # Empty string signifies no value
                 inp = response_type(inp)
-        except:
+        except ValueError:
             print_error_message(err_msg, inp)
         else:
             if condition is None or condition(inp):  # Bypass condition check if condition is None
@@ -445,7 +445,8 @@ i_attr = ParameterInfo(ATTRIBUTE,
                        err_msg="Attribute '{}' does not exist. Available attributes are type, subject, "
                                "description and duedate.")
 i_days = ParameterInfo(DAYS,
-                       int)
+                       int,
+                       err_msg="'{}' is an invalid number. Please enter a number of days to extend by.")
 
 # Define regex for matching sections of input
 RE_DUE_DATE = re.compile(r' (([0-9]{1,2} ?){1,2}([0-9]{4})?)$')
