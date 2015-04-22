@@ -13,9 +13,9 @@ Every Version:
 *       Update changelog.txt                                                    [#]
 
 Current Update:
-v2.0.4:
+v2.0.5:
 --------
-B!      Not specifying an int when extending causes crash                       [C]
+B!      Fix incorrect sorting of entries                                        [C]
 
 Future Updates:
 v2.1:
@@ -28,6 +28,10 @@ UF      Allow custom types and colours                                          
 *?      Write tests                                                             []
 
 Old Updates:
+v2.0.4:
+--------
+B!      Not specifying an int when extending causes crash                       [C]
+
 v2.0.3:
 --------
 *       Improve code efficiency by adding to requires_parameters decorator      [X]

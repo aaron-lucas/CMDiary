@@ -1,6 +1,6 @@
 # CMDiary - a command-line diary application
 
-VERSION = 'v2.0.4'
+VERSION = 'v2.0.5'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
@@ -12,6 +12,7 @@ from collections import OrderedDict
 
 from termcolor import cprint, colored
 from tabulate import tabulate
+
 if os.name == 'nt':  # Colorama only required on Windows machines
     from colorama import init, deinit
 
@@ -45,12 +46,14 @@ def requires_parameters(*params):
                    ParameterInfo object.
     :return:       A function with an empty dict of data which the function is required to fill.
     """
+
     def decorator(func):
         def wrapper(input_data):
             required_data = OrderedDict([(key, False) for key in params])  # OrderedDict to keep order of data prompts
             return func(input_data, required_data)
 
         return wrapper
+
     return decorator
 
 
@@ -61,6 +64,7 @@ def update(func):
     :param func: The function after which to update the diary table.
     :return:     A new function that automatically updates the screen after running.
     """
+
     def wrapper(*args, **kwargs):
         retval = func(*args, **kwargs)
         display()
@@ -237,8 +241,9 @@ def display(filter_=None):  # Filter not yet implemented
                      date_to_str(due_date),
                      str(days_left)])  # Format some data to str
 
-    rows.sort(key=lambda r: r[-1])  # Sort by days remaining
-    rows = [[colored(attr, COLOUR_MAP[row[1]], attrs=get_text_attributes(row)) for attr in row]
+    rows.sort(key=lambda r: int(r[-1]) if r[-1] is not NO_DATE
+                                        else float('infinity'))  # Entries with no due date must come last
+    rows = [[colored(str(attr), COLOUR_MAP[row[1]], attrs=get_text_attributes(row)) for attr in row]
             for row in rows]  # Colour-code rows based on item type
     table = tabulate(rows, headers)
     sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=24,
@@ -285,7 +290,7 @@ def str_to_date(string):
     :return: A datetime.date representation of `string`.
     """
     separator = determine_date_separator(string)
-    if not string:
+    if not string or string is NO_DATE:
         return None
 
     # No separator means only one value, and converting to datetime.date requires a list
