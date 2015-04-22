@@ -334,7 +334,7 @@ def complete_data(data):
     for key, value in data.items():
         if value:
             continue  # Data is already present
-        if key == ATTRIBUTE or data[ATTRIBUTE]:  # Attribute has or is about to be specified
+        if key == ATTRIBUTE or data.get(ATTRIBUTE, False):  # Attribute has or is about to be specified
             i_value = match_value_parameter(data)
         label = key.capitalize().replace('_', ' ') + ': '  # Change data name to readable label
 
