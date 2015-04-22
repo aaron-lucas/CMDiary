@@ -1,6 +1,7 @@
 v2.0.5:
 --------
 *   Fix bug that incorrectly sorted entries in different months
+*   Fix bug that rendered the edit function useless
 
 v2.0.4:
 --------

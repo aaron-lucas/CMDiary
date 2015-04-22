@@ -16,6 +16,7 @@ Current Update:
 v2.0.5:
 --------
 B!      Fix incorrect sorting of entries                                        [C]
+B!      Fix bug with edit function                                              [C]
 
 Future Updates:
 v2.1:

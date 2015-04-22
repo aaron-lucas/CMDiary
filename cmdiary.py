@@ -334,7 +334,7 @@ def complete_data(data):
     for key, value in data.items():
         if value:
             continue  # Data is already present
-        if key == ATTRIBUTE:  # `edit` function is running
+        if key == ATTRIBUTE or data[ATTRIBUTE]:  # Attribute has or is about to be specified
             i_value = match_value_parameter(data)
         label = key.capitalize().replace('_', ' ') + ': '  # Change data name to readable label
 
@@ -356,7 +356,7 @@ def format_existing_data(data):
     for key, value in data.items():
         if not value:
             continue  # No value to be formatted
-        if key == ATTRIBUTE:  # `edit` function is running
+        if key == ATTRIBUTE and value:  # `edit` function is running
             i_value = match_value_parameter(data)
             if i_value is None:  # Invalid attribute name passed
                 data[ATTRIBUTE] = False
