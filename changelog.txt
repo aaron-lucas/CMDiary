@@ -1,3 +1,8 @@
+v2.1:
+------
+*   Add priority feature that bolds entries with priority
+*   Entries whose due date is tomorrow are no longer bold but not underlined
+
 v2.0.5:
 --------
 *   Fix bug that incorrectly sorted entries in different months

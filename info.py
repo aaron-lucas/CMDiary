@@ -2,13 +2,15 @@ from collections import OrderedDict
 from termcolor import cprint
 
 # A dict of commands and their respective help strings
-COMMANDS = OrderedDict([('add',     '(a)dd     [type] [subject] [description] [due date] - add new entry'),
-                        ('remove',  '(r)emove  [uid] - remove an entry'),
-                        ('edit',    '(e)dit    [uid] [attr] [value] - edit an entry\'s data'),
-                        ('extend',  'e(x)tend  [uid] [days] - change an entry\'s due date by (days) days'),
-                        ('list',    '(l)ist    list all diary entries'),
-                        ('quit',    '(q)uit    quit CMDiary'),
-                        ('help',    "(h)elp    [command : 'types' : 'attrs' : 'date'] - display command info  ")])
+COMMANDS = OrderedDict([('add',      '(a)dd       [type] [subject] [description] [due date] - add new entry'),
+                        ('remove',   '(r)emove    [uid] - remove an entry'),
+                        ('edit',     '(e)dit      [uid] [attr] [value] - edit an entry\'s data'),
+                        ('extend',   'e(x)tend    [uid] [days] - change an entry\'s due date by (days) days'),
+                        ('list',     '(l)ist      list all diary entries'),
+                        ('priority', '(p)riority  [uid] [0:1] - Gives or takes priority of an entry. An entry with\n'
+                                     '            priority will appear in bold.'),
+                        ('quit',     '(q)uit      quit CMDiary'),
+                        ('help',     "(h)elp      [command : 'types' : 'attrs' : 'date'] - display command info  ")])
 
 # A list of available item types
 ITEM_TYPES = ['(h)omework', '(a)ssessment', '(n)ote']

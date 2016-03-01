@@ -13,22 +13,24 @@ Every Version:
 *       Update changelog.txt                                                    [#]
 
 Current Update:
+v2.1:
+------
+F?      Undo Feature                                                            [X]
+F?      Filter feature to select multiple entries at once                       [X]
+F       Priority feature which bolds important entries                          [C]
+F       Allow scheduling of tasks                                               [X]
+UF      Allow custom types and colours                                          [X]
+*?      Write tests                                                             [P]
+
+Future Updates:
+
+
+Old Updates:
 v2.0.5:
 --------
 B!      Fix incorrect sorting of entries                                        [C]
 B!      Fix bug with edit function                                              [C]
 
-Future Updates:
-v2.1:
-------
-F?      Undo Feature                                                            []
-F?      Filter feature to select multiple entries at once                       []
-F       Priority feature which highlights important entries                     []
-F       Allow scheduling of tasks                                               []
-UF      Allow custom types and colours                                          []
-*?      Write tests                                                             []
-
-Old Updates:
 v2.0.4:
 --------
 B!      Not specifying an int when extending causes crash                       [C]

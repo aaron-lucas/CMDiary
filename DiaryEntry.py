@@ -9,6 +9,7 @@ SUBJECT = 'subject'
 DESCRIPTION = 'description'
 DUE_DATE = 'due_date'
 ITEM_TYPE = 'item_type'
+PRIORITY = 'priority'
 
 
 class CheckedVar(object):
@@ -73,8 +74,9 @@ class DiaryEntry(object):
     description = CheckedVar(str)
     due_date = CheckedVar(datetime.date)
     item_type = CheckedVar(str, [HOMEWORK, ASSESSMENT, NOTE])
+    priority = CheckedVar(bool, default=False)
 
-    def __init__(self, owner, item_type, subject, description, due_date, uid=None):
+    def __init__(self, owner, item_type, subject, description, due_date, uid=None, priority=False):
         """Initialise instance variables."""
         self.owner = owner
         self.item_type = item_type
@@ -82,6 +84,8 @@ class DiaryEntry(object):
         self.description = description
         self.due_date = due_date
         self.uid = owner.allocate_uid() if uid is None else uid
+        self.priority = priority
+
 
     def edit(self, attr, value):
         """
@@ -91,7 +95,7 @@ class DiaryEntry(object):
         :param value:   The new value.
         :return:        None
         """
-        if attr in (UID, SUBJECT, DESCRIPTION, DUE_DATE, ITEM_TYPE):  # Available attributes
+        if attr in (UID, SUBJECT, DESCRIPTION, DUE_DATE, ITEM_TYPE, PRIORITY):  # Available attributes
             setattr(self, attr, value)
 
     @property
@@ -101,7 +105,8 @@ class DiaryEntry(object):
                 SUBJECT: self.subject,
                 DESCRIPTION: self.description,
                 DUE_DATE: self.due_date,
-                ITEM_TYPE: self.item_type}
+                ITEM_TYPE: self.item_type,
+                PRIORITY: self.priority}
 
     @property
     def days_left(self):

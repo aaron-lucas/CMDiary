@@ -111,6 +111,18 @@ class Diary(object):
                     continue
                 entry.due_date += datetime.timedelta(days=days)
 
+    @update_data
+    def priority(self, priority,  *uids):
+        """
+        Set the priority of diary entries.
+        :param priority:    A bool specifying whether the entries have priority.
+        :param uids:        A list of ints which are uids of objects to extend.
+        :return:            None
+        """
+        for entry in self.entries:
+            if entry.uid in uids:
+                entry.priority = priority
+
     def allocate_uid(self):
         """
         Generate a uid that is not already used.
@@ -123,3 +135,4 @@ class Diary(object):
 
     def filter(self, expression):
         raise NotImplementedError
+    

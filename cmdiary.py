@@ -1,6 +1,6 @@
 # CMDiary - a command-line diary application
 
-VERSION = 'v2.0.5'
+VERSION = 'v2.1'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
@@ -16,7 +16,7 @@ from tabulate import tabulate
 if os.name == 'nt':  # Colorama only required on Windows machines
     from colorama import init, deinit
 
-from DiaryEntry import ASSESSMENT, HOMEWORK, NOTE, UID, ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE
+from DiaryEntry import ASSESSMENT, HOMEWORK, NOTE, UID, ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE, PRIORITY
 from Diary import Diary
 from ParameterInfo import ParameterInfo
 from info import get_info
@@ -218,6 +218,31 @@ def extend(input_data, required_data):
     diary.extend(required_data[DAYS], required_data[UID])
 
 
+@update
+@requires_parameters(UID, PRIORITY)
+def priority(input_data, required_data):
+    """
+    Take and evaluate input to change the priority of an entry.
+
+    Signature is priority(input_data) after decoration.
+
+    :param input_data:      The raw str data entered after the 'remove' command.
+    :param required_data:   A dict provided by the requires_parameters decorator. Doesn't need to be specified when
+                            called due to the decorator.
+    :return:                None
+    """
+    try:
+        required_data[UID] = input_data.split()[0]
+        required_data[PRIORITY] = input_data.split()[1]
+    except IndexError:
+        pass  # Ignore error if data not specified as it will be entered later
+
+    format_existing_data(required_data)
+    complete_data(required_data)
+
+    diary.priority(bool(required_data[PRIORITY]), required_data[UID])
+
+
 def display(filter_=None):  # Filter not yet implemented
     """
     Display all diary entries and info as a table on the screen.
@@ -239,11 +264,12 @@ def display(filter_=None):  # Filter not yet implemented
                      entry.subject,
                      entry.description,
                      date_to_str(due_date),
-                     str(days_left)])  # Format some data to str
+                     str(days_left),
+                     entry.priority])  # Format some data to str
 
-    rows.sort(key=lambda r: int(r[-1]) if r[-1] is not NO_DATE
+    rows.sort(key=lambda r: int(r[-2]) if r[-2] is not NO_DATE  # 2nd last item is days remaining
                                         else float('infinity'))  # Entries with no due date must come last
-    rows = [[colored(str(attr), COLOUR_MAP[row[1]], attrs=get_text_attributes(row)) for attr in row]
+    rows = [[colored(str(attr), COLOUR_MAP[row[1]], attrs=get_text_attributes(row)) for attr in row[:-1]]  # Do not display priority status
             for row in rows]  # Colour-code rows based on item type
     table = tabulate(rows, headers)
     sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=24,
@@ -259,7 +285,8 @@ def get_text_attributes(row_data):
     :return: List of attributes.
     """
     attrs = []
-    days_left = row_data[-1]
+    days_left = row_data[-2]
+    priority = row_data[-1]
     if days_left != NO_DATE:
         days_left = int(days_left)
         if days_left < 0:
@@ -267,7 +294,11 @@ def get_text_attributes(row_data):
         if days_left == 0:
             attrs.append('reverse')
         if days_left == 1:
-            attrs.append('bold')
+            attrs.append('underline')
+
+    if priority:
+        attrs.append('bold')
+
     return attrs
 
 
@@ -332,8 +363,9 @@ def complete_data(data):
     :return: None
     """
     for key, value in data.items():
-        if value:
+        if value or (key == PRIORITY and value is 0):
             continue  # Data is already present
+
         if key == ATTRIBUTE or data.get(ATTRIBUTE, False):  # Attribute has or is about to be specified
             i_value = match_value_parameter(data)
         label = key.capitalize().replace('_', ' ') + ': '  # Change data name to readable label
@@ -408,7 +440,7 @@ def prompt():
     return command_str, arg_string
 
 
-def quit_cmdiary():
+def quit_cmdiary(*ignore):
     """Clean up and quit diary."""
     if os.name == 'nt':  # Colorama only required on Windows machines
         deinit()  # Colorama deinit function
@@ -453,6 +485,11 @@ i_days = ParameterInfo(DAYS,
                        int,
                        err_msg="'{}' is an invalid number. Please enter a number of days to extend by.")
 
+i_priority = ParameterInfo(PRIORITY,
+                           int,
+                           condition=lambda x: x in (0, 1),
+                           err_msg="'{}' is invalid, please enter 0 or 1.")
+
 # Define regex for matching sections of input
 RE_DUE_DATE = re.compile(r' (([0-9]{1,2} ?){1,2}([0-9]{4})?)$')
 
@@ -464,14 +501,16 @@ PARAMETERS = {UID: i_uid,
               DESCRIPTION: i_description,
               DUE_DATE: i_due_date,
               ATTRIBUTE: i_attr,
-              DAYS: i_days}
+              DAYS: i_days,
+              PRIORITY: i_priority}
 
 # Dict mapping strings and abbreviations to possible attributes
 ATTRIBUTES = ({'u': UID, UID: UID,
                't': ITEM_TYPE, 'type': ITEM_TYPE, ITEM_TYPE: ITEM_TYPE,
                's': SUBJECT, SUBJECT: SUBJECT,
                'd': DESCRIPTION, DESCRIPTION: DESCRIPTION,
-               'due': DUE_DATE, 'duedate': DUE_DATE, DUE_DATE: DUE_DATE})
+               'due': DUE_DATE, 'duedate': DUE_DATE, DUE_DATE: DUE_DATE,
+               'p': PRIORITY, 'priority': PRIORITY})
 
 # Dict mapping strings and abbreviations to item types
 ITEM_TYPES = {
@@ -487,7 +526,8 @@ COMMANDS = {'add': add, 'a': add,
             'extend': extend, 'x': extend,
             'quit': quit_cmdiary, 'q': quit_cmdiary,
             'list': display, 'l': display,
-            'help': get_info, 'h': get_info}
+            'help': get_info, 'h': get_info,
+            'priority': priority, 'p': priority}
 
 # Run the diary
 if __name__ == '__main__':
