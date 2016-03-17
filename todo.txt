@@ -1,52 +1,59 @@
 TODO FILE
 
 -------------------------------------------------------------------------------------------------
-| F     = New feature           | ?     = May implement         | [X]   = Will not implement    |
-| U     = Update old feature    | !     = High priority         | [P]   = Partially completed   |
-| B     = Bugfix                |                               | [C]   = Completed             |
-| *     = Other                 |                               | [#]   = For every version     |
+| B     = Bugfix                | ?     = May implement         | [X]   = Will not implement    |
+| F     = New feature           | !     = High priority         | [P]   = Partially completed   |
+| U     = Update old feature    |                               | [C]   = Completed             |
+| *     = Other                 |                               |                               |
 -------------------------------------------------------------------------------------------------
 
 Every Version:
 ---------------
-*       Update version number                                                   [#]
-*       Update changelog.txt                                                    [#]
+   *    Update version number                                                   [ ]
+   *    Update changelog.txt                                                    [ ]
 
 Current Update:
-v2.1:
-------
-F?      Undo Feature                                                            [X]
-F?      Filter feature to select multiple entries at once                       [X]
-F       Priority feature which bolds important entries                          [C]
-F       Allow scheduling of tasks                                               [X]
-UF      Allow custom types and colours                                          [X]
-*?      Write tests                                                             [P]
+v2.1.1:
+--------
+  U     Change random UIDs to order of display                                  [ ]
+B U     Allow cancellation when prompted for input                              [ ]
+  U     Make todo file more readable putting classifications in columns         [C]
+  U     Remove redundant '# = for every version' classification in todo file    [C]
 
 Future Updates:
 
 
 Old Updates:
+v2.1:
+------
+ F  ?   Undo Feature                                                            [X]
+ F  ?   Filter feature to select multiple entries at once                       [X]
+ F      Priority feature which bolds important entries                          [C]
+ F      Allow scheduling of tasks                                               [X]
+ FU     Allow custom types and colours                                          [X]
+   *?   Write tests                                                             [P]
+
 v2.0.5:
 --------
-B!      Fix incorrect sorting of entries                                        [C]
-B!      Fix bug with edit function                                              [C]
+B   !   Fix incorrect sorting of entries                                        [C]
+B   !   Fix bug with edit function                                              [C]
 
 v2.0.4:
 --------
-B!      Not specifying an int when extending causes crash                       [C]
+B   !   Not specifying an int when extending causes crash                       [C]
 
 v2.0.3:
 --------
-*       Improve code efficiency by adding to requires_parameters decorator      [X]
-B!      Providing nonexistent attribute when editing causes crash               [C]
-U       Underline instead of bold entries due in 1 day                          [C]
+   *    Improve code efficiency by adding to requires_parameters decorator      [X]
+B   !   Providing nonexistent attribute when editing causes crash               [C]
+  U     Underline instead of bold entries due in 1 day                          [C]
 
 v2.0.2:
 --------
-*       Add comments and docstrings                                             [C]
+   *    Add comments and docstrings                                             [C]
 B       Allow blank fields when entering data                                   [C]
-B!      Fix crash when editing due date                                         [C]
-*       Add todo.txt and changelog.txt                                          [C]
-B!      Make colours work on windows (using colorama)                           [C]
+B   !   Fix crash when editing due date                                         [C]
+   *    Add todo.txt and changelog.txt                                          [C]
+B   !   Make colours work on windows (using colorama)                           [C]
 
 ** todo.txt did not exist before version 2.0.2 **
