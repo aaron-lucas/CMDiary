@@ -13,12 +13,13 @@ Every Version:
    *    Update changelog.txt                                                    [ ]
 
 Current Update:
-v2.1.1:
+v2.2:
 --------
-  U     Change random UIDs to order of display                                  [ ]
+  U     Change random UIDs to order of display                                  [C]
 B U     Allow cancellation when prompted for input                              [ ]
   U     Make todo file more readable putting classifications in columns         [C]
   U     Remove redundant '# = for every version' classification in todo file    [C]
+  U     Sort items due on the same date by type, subject then description       [C]
 
 Future Updates:
 

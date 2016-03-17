@@ -123,9 +123,10 @@ class Diary(object):
             if entry.uid in uids:
                 entry.priority = priority
 
-    def allocate_uid(self):
+    def generate_initial_uid(self):
         """
         Generate a uid that is not already used.
+        This will be changed later on based on the order of display.
         :return:    An int between 100 and 999.
         """
         while True:

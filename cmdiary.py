@@ -1,6 +1,6 @@
 # CMDiary - a command-line diary application
 
-VERSION = 'v2.1'
+VERSION = 'v2.2'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
@@ -25,7 +25,6 @@ from info import get_info
 ATTRIBUTE = 'attribute'
 VALUE = 'value'  # Changes depending on chosen attribute - used in edit()
 DAYS = 'days'  # days parameter name/reference
-NEW_UID = 'new_uid'  # Parameter name requiring nonexistent uid
 
 COLOUR_MAP = {ASSESSMENT: 'red',
               HOMEWORK: 'blue',
@@ -256,25 +255,32 @@ def display(filter_=None):  # Filter not yet implemented
         return
     headers = ('UID', 'Type', 'Subject', 'Description', 'Due Date', 'Days Left')
     rows = []
-    for entry in diary.entries:
+    entries = sorted(diary.entries, key=entry_sort_info)
+
+    for new_uid, entry in enumerate(entries):
+        entry.uid = new_uid + 1
         due_date = entry.due_date if entry.due_date is not None else NO_DATE
         days_left = entry.days_left if entry.days_left is not None else NO_DATE
-        rows.append([str(entry.uid),
+        rows.append(['{:0>3}'.format(entry.uid),
                      entry.item_type,
                      entry.subject,
                      entry.description,
                      date_to_str(due_date),
-                     str(days_left),
+                     days_left,
                      entry.priority])  # Format some data to str
 
-    rows.sort(key=lambda r: int(r[-2]) if r[-2] is not NO_DATE  # 2nd last item is days remaining
-                                        else float('infinity'))  # Entries with no due date must come last
     rows = [[colored(str(attr), COLOUR_MAP[row[1]], attrs=get_text_attributes(row)) for attr in row[:-1]]  # Do not display priority status
             for row in rows]  # Colour-code rows based on item type
+
     table = tabulate(rows, headers)
     sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=24,
                                                     cols=max((len(table.split('\n')[1])), 80)))  # Resize window
     print(table + '\n')  # Newline after table is more aesthetically pleasing.
+
+
+def entry_sort_info(entry):
+    days_left = entry.days_left if entry.days_left is not None else float('infinity')
+    return days_left, entry.item_type, entry.subject, entry.description
 
 
 def get_text_attributes(row_data):
@@ -413,11 +419,7 @@ def match_value_parameter(data):
     :return:
     """
     if data.get(ATTRIBUTE, False):  # Check to see if the attribute field has a value
-        if data[ATTRIBUTE] == UID:
-            i_value = i_new_uid  # The attribute argument is only used in `edit` so a new uid should be specified
-        else:
-            i_value = PARAMETERS.get(ATTRIBUTES.get(data[ATTRIBUTE], None), None)  # Match parameter to data value
-        return i_value
+        return PARAMETERS.get(ATTRIBUTES.get(data[ATTRIBUTE], None), None)  # Match parameter to data value
 
 
 def prompt():
@@ -456,11 +458,6 @@ i_uid = ParameterInfo(UID,
                       condition=lambda uid: int(uid) in diary.taken_uids,
                       err_msg='Object with UID {} does not exist')
 
-i_new_uid = ParameterInfo(NEW_UID,
-                          int,
-                          condition=lambda uid: (uid not in diary.taken_uids) and (uid in range(1, 1000)),
-                          err_msg='Object with UID {} already exists or invalid uid (must be between 1 and 999)')
-
 i_item_type = ParameterInfo(ITEM_TYPE,
                             condition=lambda x: x in ITEM_TYPES.keys(),
                             modifier=lambda x: ITEM_TYPES.get(x, HOMEWORK),
@@ -495,7 +492,6 @@ RE_DUE_DATE = re.compile(r' (([0-9]{1,2} ?){1,2}([0-9]{4})?)$')
 
 # Dict of parameter names and info objects
 PARAMETERS = {UID: i_uid,
-              NEW_UID: i_new_uid,
               ITEM_TYPE: i_item_type,
               SUBJECT: i_subject,
               DESCRIPTION: i_description,
@@ -505,8 +501,7 @@ PARAMETERS = {UID: i_uid,
               PRIORITY: i_priority}
 
 # Dict mapping strings and abbreviations to possible attributes
-ATTRIBUTES = ({'u': UID, UID: UID,
-               't': ITEM_TYPE, 'type': ITEM_TYPE, ITEM_TYPE: ITEM_TYPE,
+ATTRIBUTES = ({'t': ITEM_TYPE, 'type': ITEM_TYPE, ITEM_TYPE: ITEM_TYPE,
                's': SUBJECT, SUBJECT: SUBJECT,
                'd': DESCRIPTION, DESCRIPTION: DESCRIPTION,
                'due': DUE_DATE, 'duedate': DUE_DATE, DUE_DATE: DUE_DATE,

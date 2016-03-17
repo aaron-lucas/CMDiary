@@ -83,7 +83,7 @@ class DiaryEntry(object):
         self.subject = subject
         self.description = description
         self.due_date = due_date
-        self.uid = owner.allocate_uid() if uid is None else uid
+        self.uid = owner.generate_initial_uid() if uid is None else uid
         self.priority = priority
 
 
