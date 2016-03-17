@@ -31,6 +31,7 @@ COLOUR_MAP = {ASSESSMENT: 'red',
               NOTE: 'green'}
 
 NO_DATE = 'N/A'  # String used as placeholder if no date is specified
+CANCEL_CHARACTER = '\\'
 
 
 def requires_parameters(*params):
@@ -87,6 +88,8 @@ def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg=
     while True:
         inp = input(prompt)
         try:
+            if inp == CANCEL_CHARACTER:
+                return CANCEL_CHARACTER
             if inp or inp == '':  # Empty string signifies no value
                 inp = response_type(inp)
         except ValueError:
@@ -137,8 +140,9 @@ def add(input_data, required_data):
     required_data[DESCRIPTION] = match.string[:match.start()] if match is not None else unparsed_data
 
     format_existing_data(required_data)
-    complete_data(required_data)
-
+    cancel = complete_data(required_data) == CANCEL_CHARACTER
+    if cancel:
+        return
     diary.add(**required_data)  # Parameter names in required_data match with diary.add function
 
 
@@ -161,8 +165,9 @@ def remove(input_data, required_data):
         pass  # Ignore error if data not specified as it will be entered later
 
     format_existing_data(required_data)
-    complete_data(required_data)
-
+    cancel = complete_data(required_data) == CANCEL_CHARACTER
+    if cancel:
+        return
     diary.remove(required_data[UID])
 
 
@@ -188,7 +193,9 @@ def edit(input_data, required_data):
 
     format_existing_data(required_data)
     if any([not bool(val) for val in required_data.values()]):  # Check if any data needs to be entered
-        complete_data(required_data)
+        cancel = complete_data(required_data) == CANCEL_CHARACTER
+        if cancel:
+            return
     diary.edit(required_data[ATTRIBUTE], required_data[VALUE], required_data[UID])
 
 
@@ -212,8 +219,9 @@ def extend(input_data, required_data):
         pass  # Ignore error if data not specified as it will be entered later
 
     format_existing_data(required_data)
-    complete_data(required_data)
-
+    cancel = complete_data(required_data) == CANCEL_CHARACTER
+    if cancel:
+        return
     diary.extend(required_data[DAYS], required_data[UID])
 
 
@@ -237,8 +245,9 @@ def priority(input_data, required_data):
         pass  # Ignore error if data not specified as it will be entered later
 
     format_existing_data(required_data)
-    complete_data(required_data)
-
+    cancel = complete_data(required_data) == CANCEL_CHARACTER
+    if cancel:
+        return
     diary.priority(bool(required_data[PRIORITY]), required_data[UID])
 
 
@@ -377,11 +386,17 @@ def complete_data(data):
         label = key.capitalize().replace('_', ' ') + ': '  # Change data name to readable label
 
         param_info = PARAMETERS[key] if key != VALUE else i_value  # ATTRIBUTE comes before VALUE
-        data[key] = get_input(prompt=label,
-                              response_type=param_info.data_type,
-                              condition=param_info.condition,
-                              modifier=param_info.modifier,
-                              err_msg=param_info.err_msg)
+        inp = get_input(prompt=label,
+                        response_type=param_info.data_type,
+                        condition=param_info.condition,
+                        modifier=param_info.modifier,
+                        err_msg=param_info.err_msg)
+
+        if inp == CANCEL_CHARACTER:
+            return CANCEL_CHARACTER
+
+        data[key] = inp
+
 
 
 def format_existing_data(data):

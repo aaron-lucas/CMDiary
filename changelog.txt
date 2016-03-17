@@ -1,3 +1,11 @@
+v2.2:
+------
+*   Change random UIDs to order of display
+*   Allow cancellation when prompted for input
+*   Make todo file more readable putting classifications in columns
+*   Remove redundant '# = for every version' classification in todo file
+*   Sort items due on the same date by type, subject then description
+
 v2.1:
 ------
 *   Add priority feature that bolds entries with priority

@@ -10,13 +10,14 @@ COMMANDS = OrderedDict([('add',      '(a)dd       [type] [subject] [description]
                         ('priority', '(p)riority  [uid] [0:1] - Gives or takes priority of an entry. An entry with\n'
                                      '            priority will appear in bold.'),
                         ('quit',     '(q)uit      quit CMDiary'),
-                        ('help',     "(h)elp      [command : 'types' : 'attrs' : 'date'] - display command info  ")])
+                        ('help',     "(h)elp      [command : 'types' : 'attrs' : 'date'] - display command info  "),
+                        ('cancel',   "Use '\\' to cancel a prompt and return to the main screen")])
 
 # A list of available item types
 ITEM_TYPES = ['(h)omework', '(a)ssessment', '(n)ote']
 
 # A list of available attributes
-ATTRIBUTES = ['(s)ubject', '(d)escription', '(due)date', '(t)ype']
+ATTRIBUTES = ['(s)ubject', '(d)escription', '(due)date', '(t)ype', '(p)riority']
 
 # A string containing help for date formatting
 DATE_FORMATTING = '* Dates can be represented by using 1 to 3 numbers, separated by a space ( ), dash (-), or slash' \
