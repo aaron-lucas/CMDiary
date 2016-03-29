@@ -136,4 +136,3 @@ class Diary(object):
 
     def filter(self, expression):
         raise NotImplementedError
-    
