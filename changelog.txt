@@ -1,3 +1,7 @@
+v2.3:
+------
+*   Add 'filter' command to select and manipulate multiple entries at once
+
 v2.2:
 ------
 *   Change random UIDs to order of display

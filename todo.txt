@@ -10,12 +10,12 @@ TODO FILE
 Every Version:
 ---------------
    *    Update version number                                                   [C]
-   *    Update changelog.txt                                                    [C]
+   *    Update changelog.txt                                                    [P]
 
 Current Update:
 v2.3:
 ------
- F      Add filter function to select multiple entries at once                  [P]
+ F      Add filter function to select multiple entries at once                  [C]
  FU     Update help section to contain filter info                              [ ]
    *    Update docstrings and comments                                          [ ]
 

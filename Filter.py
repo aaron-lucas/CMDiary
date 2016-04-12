@@ -1,4 +1,5 @@
 import re
+from datetime import date
 from DiaryEntry import UID, ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE, PRIORITY, DAYS_LEFT
 ATTR_MSG = 'Attribute does not exist'
 VALUE_MSG = 'Invalid value'
@@ -11,6 +12,7 @@ FILTER_ATTRIBUTES = {
     'priority': PRIORITY, 'p': PRIORITY,
     'daysleft': DAYS_LEFT, 'days': DAYS_LEFT
 }
+
 
 class FilterException(Exception):
     pass
@@ -31,6 +33,8 @@ def filter_function(function):
                     matched.append(obj)
             except ValueError:
                 return VALUE_MSG
+            except TypeError:
+                return 'Due date cannot be used with the < or > operator. Use \'days\' instead.'
         return matched
     return wrapper
 
@@ -48,7 +52,7 @@ class Filter:
     def refine(self, condition):
         if self.is_valid_condition(condition):
             attr, operator, value = re.match(self.condition_format, condition).groups()
-            attr = FILTER_ATTRIBUTES[attr]
+            attr = FILTER_ATTRIBUTES.get(attr, 'error')
             matched_objects = self.select(attr, operator, value)
             if type(matched_objects) is list:
                 self.objects = matched_objects

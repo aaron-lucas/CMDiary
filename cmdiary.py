@@ -1,7 +1,6 @@
 # CMDiary - a command-line diary application
 
-VERSION = 'v2.2'
-PROMPT = 'CMDiary {}> '.format(VERSION)
+VERSION = 'v2.3'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
@@ -34,6 +33,7 @@ COLOUR_MAP = {ASSESSMENT: 'red',
 
 NO_DATE = 'N/A'  # String used as placeholder if no date is specified
 CANCEL_CHARACTER = '\\'
+PROMPT = 'CMDiary {}> '.format(VERSION)
 
 
 def requires_parameters(*params):
@@ -252,20 +252,26 @@ def filter_entries(filter_str):
     if not filter_str:
         filter_str = None
     f = Filter(diary.entries, filter_str)
+    display_filters(f)
     while True:
-        display(f.objects, extra='Filters:\n' +
-                                 colored('{}'.format(f.filter_string if f.filters else 'No Filters'), 'yellow'))
-        cmd = get_input('{}filter$ '.format(PROMPT))
-
+        cmd = get_input('{}filter$ '.format(PROMPT), condition=lambda x: x != '', err_msg='')
         if f.is_valid_condition(cmd):
-            f.refine(cmd)
+            try:
+                f.refine(cmd)
+                display_filters(f)
+            except FilterException as fe:
+                cprint(fe.args[0], 'yellow')
             continue
         elif cmd in ['clear', 'reset']:
             f.reset()
+            display_filters(f)
+            continue
+        elif cmd in ['l', 'list']:
+            display_filters(f)
             continue
         elif cmd not in ['quit', 'exit', 'cancel']:
             cmd, f_args = process_input(cmd)
-            if cmd is None or cmd not in [remove, edit, priority, extend]:
+            if cmd not in [remove, edit, priority, extend]:
                 continue
 
             for obj in f.objects:
@@ -275,22 +281,30 @@ def filter_entries(filter_str):
         break
 
 
+def display_filters(filter_obj):
+    display(filter_obj.objects, extra='Filters:\n' +
+                             colored('{}'.format(filter_obj.filter_string if filter_obj.filters else 'No Filters'),
+                                     'yellow'))
+
+
 def display(items='', extra=None):
     """
     Display all diary entries and info as a table on the screen.
 
     :param items: List which sets items to be displayed. Defaults to all entries.
+    :param extra: Extra text to be displayed after the table.
     :return: None.
     """
 
     os.system('cls' if os.name == 'nt' else 'clear')  # For Windows/Mac/Linux compatibility
-    if not items and not len(diary.entries):  # Displaying all diary entries and diary is empty
+    if items == '' and not len(diary.entries):  # Displaying all diary entries and diary is empty
         cprint('Diary has no entries.\n', 'yellow')
         return
-    items = items if items else diary.entries
+    items = items if items != '' else diary.entries
 
     if not len(items):  # Using filter function
-        cprint('No entries match these criteria', 'yellow')
+        cprint('No entries match these criteria\n', 'yellow')
+        print(extra + '\n')
         return
 
     headers = ('UID', 'Type', 'Subject', 'Description', 'Due Date', 'Days Left')
@@ -309,7 +323,8 @@ def display(items='', extra=None):
                      days_left,
                      entry.priority])  # Format some data to str
 
-    rows = [[colored(str(attr), COLOUR_MAP[row[1]], attrs=get_text_attributes(row)) for attr in row[:-1]]  # Do not display priority status
+    rows = [[colored(str(attr), COLOUR_MAP[row[1]],
+                     attrs=get_text_attributes(row)) for attr in row[:-1]]  # Do not display priority status
             for row in rows]  # Colour-code rows based on item type
 
     table = tabulate(rows, headers)
