@@ -13,6 +13,16 @@ Every Version:
    *    Update changelog.txt                                                    [C]
 
 Current Update:
+v2.3:
+------
+ F      Add filter function to select multiple entries at once                  [C]
+ FU     Update help section to contain filter info                              [C]
+   *    Update docstrings and comments                                          [C]
+
+Future Updates:
+
+
+Old Updates:
 v2.2:
 ------
   U     Change random UIDs to order of display                                  [C]
@@ -21,10 +31,6 @@ B U     Allow cancellation when prompted for input                              
   U     Remove redundant '# = for every version' classification in todo file    [C]
   U     Sort items due on the same date by type, subject then description       [C]
 
-Future Updates:
-
-
-Old Updates:
 v2.1:
 ------
  F  ?   Undo Feature                                                            [X]
