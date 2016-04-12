@@ -1,6 +1,7 @@
 # CMDiary - a command-line diary application
 
 VERSION = 'v2.2'
+PROMPT = 'CMDiary {}> '.format(VERSION)
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
@@ -20,6 +21,7 @@ from DiaryEntry import ASSESSMENT, HOMEWORK, NOTE, UID, ITEM_TYPE, SUBJECT, DESC
 from Diary import Diary
 from ParameterInfo import ParameterInfo
 from info import get_info
+from Filter import Filter, FilterException
 
 # Define custom parameter names
 ATTRIBUTE = 'attribute'
@@ -112,7 +114,6 @@ def print_error_message(msg_template, inp):
     cprint(message, 'yellow')
 
 
-@update
 @requires_parameters(ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE)
 def add(input_data, required_data):
     """
@@ -146,7 +147,6 @@ def add(input_data, required_data):
     diary.add(**required_data)  # Parameter names in required_data match with diary.add function
 
 
-@update
 @requires_parameters(UID)
 def remove(input_data, required_data):
     """
@@ -171,7 +171,6 @@ def remove(input_data, required_data):
     diary.remove(required_data[UID])
 
 
-@update
 @requires_parameters(UID, ATTRIBUTE, VALUE)
 def edit(input_data, required_data):
     """
@@ -199,7 +198,6 @@ def edit(input_data, required_data):
     diary.edit(required_data[ATTRIBUTE], required_data[VALUE], required_data[UID])
 
 
-@update
 @requires_parameters(UID, DAYS)
 def extend(input_data, required_data):
     """
@@ -225,7 +223,6 @@ def extend(input_data, required_data):
     diary.extend(required_data[DAYS], required_data[UID])
 
 
-@update
 @requires_parameters(UID, PRIORITY)
 def priority(input_data, required_data):
     """
@@ -248,23 +245,57 @@ def priority(input_data, required_data):
     cancel = complete_data(required_data) == CANCEL_CHARACTER
     if cancel:
         return
-    diary.priority(bool(required_data[PRIORITY]), required_data[UID])
+    diary.priority(required_data[PRIORITY], required_data[UID])
 
 
-def display(filter_=None):  # Filter not yet implemented
+def filter_entries(filter_str):
+    if not filter_str:
+        filter_str = None
+    f = Filter(diary.entries, filter_str)
+    while True:
+        display(f.objects, extra='Filters:\n' +
+                                 colored('{}'.format(f.filter_string if f.filters else 'No Filters'), 'yellow'))
+        cmd = get_input('{}filter$ '.format(PROMPT))
+
+        if f.is_valid_condition(cmd):
+            f.refine(cmd)
+            continue
+        elif cmd in ['clear', 'reset']:
+            f.reset()
+            continue
+        elif cmd not in ['quit', 'exit', 'cancel']:
+            cmd, f_args = process_input(cmd)
+            if cmd is None or cmd not in [remove, edit, priority, extend]:
+                continue
+
+            for obj in f.objects:
+                uid = obj.uid
+                new_args = '{} {}'.format(uid, f_args)
+                cmd(new_args)
+        break
+
+
+def display(items='', extra=None):
     """
     Display all diary entries and info as a table on the screen.
 
-    :param filter_: A string to be analysed to view only certain entries. Not yet implemented.
+    :param items: List which sets items to be displayed. Defaults to all entries.
     :return: None.
     """
+
     os.system('cls' if os.name == 'nt' else 'clear')  # For Windows/Mac/Linux compatibility
-    if not len(diary.entries):
+    if not items and not len(diary.entries):  # Displaying all diary entries and diary is empty
         cprint('Diary has no entries.\n', 'yellow')
         return
+    items = items if items else diary.entries
+
+    if not len(items):  # Using filter function
+        cprint('No entries match these criteria', 'yellow')
+        return
+
     headers = ('UID', 'Type', 'Subject', 'Description', 'Due Date', 'Days Left')
     rows = []
-    entries = sorted(diary.entries, key=entry_sort_info)
+    entries = sorted(items, key=entry_sort_info)
 
     for new_uid, entry in enumerate(entries):
         entry.uid = new_uid + 1
@@ -285,6 +316,8 @@ def display(filter_=None):  # Filter not yet implemented
     sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=24,
                                                     cols=max((len(table.split('\n')[1])), 80)))  # Resize window
     print(table + '\n')  # Newline after table is more aesthetically pleasing.
+    if extra is not None:
+        print(extra + '\n')
 
 
 def entry_sort_info(entry):
@@ -398,7 +431,6 @@ def complete_data(data):
         data[key] = inp
 
 
-
 def format_existing_data(data):
     """
     Convert data to required format for processing.
@@ -443,9 +475,13 @@ def prompt():
 
     :return: The strings of the command and arguments. Command is None if not supplied.
     """
-    inp = input('CMDiary {}> '.format(VERSION))
+    inp = input(PROMPT)
     if not inp:
         return None, ''
+    return process_input(inp)
+
+
+def process_input(inp):
     split_input = inp.split(maxsplit=1)  # Separate command from arguments
     command_str = split_input[0]
     try:
@@ -516,11 +552,11 @@ PARAMETERS = {UID: i_uid,
               PRIORITY: i_priority}
 
 # Dict mapping strings and abbreviations to possible attributes
-ATTRIBUTES = ({'t': ITEM_TYPE, 'type': ITEM_TYPE, ITEM_TYPE: ITEM_TYPE,
-               's': SUBJECT, SUBJECT: SUBJECT,
-               'd': DESCRIPTION, DESCRIPTION: DESCRIPTION,
-               'due': DUE_DATE, 'duedate': DUE_DATE, DUE_DATE: DUE_DATE,
-               'p': PRIORITY, 'priority': PRIORITY})
+ATTRIBUTES = {'t': ITEM_TYPE, 'type': ITEM_TYPE, ITEM_TYPE: ITEM_TYPE,
+              's': SUBJECT, SUBJECT: SUBJECT,
+              'd': DESCRIPTION, DESCRIPTION: DESCRIPTION,
+              'due': DUE_DATE, 'duedate': DUE_DATE, DUE_DATE: DUE_DATE,
+              'p': PRIORITY, 'priority': PRIORITY}
 
 # Dict mapping strings and abbreviations to item types
 ITEM_TYPES = {
@@ -537,7 +573,8 @@ COMMANDS = {'add': add, 'a': add,
             'quit': quit_cmdiary, 'q': quit_cmdiary,
             'list': display, 'l': display,
             'help': get_info, 'h': get_info,
-            'priority': priority, 'p': priority}
+            'priority': priority, 'p': priority,
+            'filter': filter_entries, 'f': filter_entries}
 
 # Run the diary
 if __name__ == '__main__':
@@ -552,5 +589,7 @@ if __name__ == '__main__':
             if command is get_info:
                 args = args if args else None  # get_info has slightly different parameter requirements
             command(args)
+            if command is not get_info:
+                display()
     except KeyboardInterrupt:
         quit_cmdiary()  # Exit without crash info

@@ -115,7 +115,7 @@ class Diary(object):
     def priority(self, priority,  *uids):
         """
         Set the priority of diary entries.
-        :param priority:    A bool specifying whether the entries have priority.
+        :param priority:    An int specifying whether the entries have priority.
         :param uids:        A list of ints which are uids of objects to extend.
         :return:            None
         """
