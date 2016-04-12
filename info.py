@@ -55,7 +55,7 @@ DATE_FORMATTING = '* Dates can be represented by using 1 to 3 numbers, separated
 FILTER_HELP = '* In filter mode, you can specify conditions to select multiple entries.\n' + \
               '* Conditions are entered in the form ' + arg('[attribute][operator][value]') + '.\n' + \
               '* Conditions can be entered at the prompt until a selection has been made.\n' + \
-              '* The ' + cmd('remove') +', ' + cmd('edit') + ', ' + cmd('extend') + ' and ' + cmd('priority') + \
+              '* The ' + cmd('remove') + ', ' + cmd('edit') + ', ' + cmd('extend') + ' and ' + cmd('priority') + \
               ' commands can then be used, without the need to specify uids.\n' + \
               important('Attributes') + ': (u)id, (s)ubject, (d)escription, (due)date, (days)left.\n' + \
               important('Operators') + ':\n    =    Equal to\n    >    Greater than\n    <    Less than\n' \

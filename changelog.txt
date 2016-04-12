@@ -3,10 +3,11 @@ v2.3:
 *   Add 'filter' command to select and manipulate multiple entries at once
 *   Help section now only initially displays item types, attributes and commands only
 *   Help section is now in colour
+*   Update some docstrings
 
 v2.2:
 ------
-*   Change random UIDs to order of display
+*   Change random UIDs to reflect order of display
 *   Allow cancellation when prompted for input
 *   Make todo file more readable putting classifications in columns
 *   Remove redundant '# = for every version' classification in todo file

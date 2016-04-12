@@ -32,7 +32,7 @@ class Diary(object):
     def __init__(self):
         """
         Load any locally stored data into the `entries` variable.
-        :return: None
+        :return: None.
         """
         self.entries = self.load_data()
 
@@ -67,7 +67,7 @@ class Diary(object):
         :param subject:     A subject str.
         :param description: A description str.
         :param due_date:    A datetime.date object specifying the due date of the entry.
-        :return:            None
+        :return:            None.
         """
         self.entries.append(DiaryEntry(self, item_type, subject, description, due_date))
 
@@ -77,7 +77,7 @@ class Diary(object):
         Remove entries from the diary.
 
         :param uids:    A list of ints which are uids of objects to remove.
-        :return:        None
+        :return:        None.
         """
         for entry in self.entries:
             if entry.uid in uids:
@@ -91,7 +91,7 @@ class Diary(object):
         :param attr:    A str containing the attribute name to edit.
         :param value:   The new value to set.
         :param uids:    A list of ints which are uids of objects to edit
-        :return:        None
+        :return:        None.
         """
         for entry in self.entries:
             if entry.uid in uids:
@@ -103,7 +103,7 @@ class Diary(object):
         Extend the due date of diary entries.
         :param days:    An int specifying the number of days to extend by (can be negative).
         :param uids:    A list of ints which are uids of objects to extend.
-        :return:        None
+        :return:        None.
         """
         for entry in self.entries:
             if entry.uid in uids:
@@ -117,7 +117,7 @@ class Diary(object):
         Set the priority of diary entries.
         :param priority:    An int specifying whether the entries have priority.
         :param uids:        A list of ints which are uids of objects to extend.
-        :return:            None
+        :return:            None.
         """
         for entry in self.entries:
             if entry.uid in uids:
@@ -133,6 +133,3 @@ class Diary(object):
             uid = randint(100, 999)
             if uid not in self.taken_uids:
                 return uid
-
-    def filter(self, expression):
-        raise NotImplementedError

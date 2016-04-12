@@ -59,22 +59,6 @@ def requires_parameters(*params):
     return decorator
 
 
-def update(func):
-    """
-    A decorator that updates the diary table after running the specified function.
-
-    :param func: The function after which to update the diary table.
-    :return:     A new function that automatically updates the screen after running.
-    """
-
-    def wrapper(*args, **kwargs):
-        retval = func(*args, **kwargs)
-        display()
-        return retval
-
-    return wrapper
-
-
 def get_input(prompt, response_type=str, condition=None, modifier=None, err_msg='Invalid Argument'):
     """
     Prompt the user for input.
@@ -124,7 +108,7 @@ def add(input_data, required_data):
     :param input_data:      The raw str data entered after the 'add' command.
     :param required_data:   A dict provided by the requires_parameters decorator. Doesn't need to be specified when
                             called due to the decorator.
-    :return:                None
+    :return:                None.
     """
     try:
         required_data[ITEM_TYPE] = input_data.split()[0]  # item_type is always first word
@@ -157,7 +141,7 @@ def remove(input_data, required_data):
     :param input_data:      The raw str data entered after the 'remove' command.
     :param required_data:   A dict provided by the requires_parameters decorator. Doesn't need to be specified when
                             called due to the decorator.
-    :return:                None
+    :return:                None.
     """
     try:
         required_data[UID] = input_data.split()[0]  # UID is always first word
@@ -181,7 +165,7 @@ def edit(input_data, required_data):
     :param input_data:      The raw str data entered after the 'edit' command.
     :param required_data:   A dict provided by the requires_parameters decorator. Doesn't need to be specified when
                             called due to the decorator.
-    :return:                None
+    :return:                None.
     """
     try:
         required_data[UID] = input_data.split()[0]  # UID is always first word
@@ -208,7 +192,7 @@ def extend(input_data, required_data):
     :param input_data:      The raw str data entered after the 'remove' command.
     :param required_data:   A dict provided by the requires_parameters decorator. Doesn't need to be specified when
                             called due to the decorator.
-    :return:                None
+    :return:                None.
     """
     try:
         required_data[UID] = input_data.split()[0]  # UID is always first word
@@ -233,7 +217,7 @@ def priority(input_data, required_data):
     :param input_data:      The raw str data entered after the 'remove' command.
     :param required_data:   A dict provided by the requires_parameters decorator. Doesn't need to be specified when
                             called due to the decorator.
-    :return:                None
+    :return:                None.
     """
     try:
         required_data[UID] = input_data.split()[0]
@@ -248,13 +232,23 @@ def priority(input_data, required_data):
     diary.priority(required_data[PRIORITY], required_data[UID])
 
 
-def filter_entries(filter_str):
-    if not filter_str:
+def filter_entries(filter_str=''):
+    """
+    Enter and handle filter mode.
+
+    Prompts for filter conditions to filter the list of entries and commands to handle entries in bulk.
+
+    :param filter_str:      An optional initial filter condition string.
+    :return:                None.
+    """
+    if not filter_str:  # No initial filter condition given
         filter_str = None
     f = Filter(diary.entries, filter_str)
     display_filters(f)
     while True:
-        cmd = get_input('{} (filter mode)> '.format(PROMPT), condition=lambda x: x != '', err_msg='')
+        cmd = get_input('{} (filter mode)> '.format(PROMPT),
+                        condition=lambda x: x != '',  # Do not accept blank string
+                        err_msg='')  # No error message if blank string is entered
         if f.is_valid_condition(cmd):
             try:
                 f.refine(cmd)
@@ -262,40 +256,48 @@ def filter_entries(filter_str):
             except FilterException as fe:
                 cprint(fe.args[0], 'yellow')
             continue
+
         elif cmd in ['reset', 'r']:
             f.reset()
             display_filters(f)
             continue
+
         elif cmd in ['l', 'list']:
             display_filters(f)
             continue
-        elif cmd not in ['quit', 'q']:
-            cmd, f_args = process_input(cmd)
-            if cmd not in [remove, edit, priority, extend]:
+
+        elif cmd not in ['quit', 'q']:  # Otherwise a diary command has been entered
+            cmd, f_args = process_input(cmd)  # Separate command and arguments
+            if cmd not in [remove, edit, priority, extend]:  # These are the only commands available in filter mode
                 continue
 
             for obj in f.objects:
-                uid = obj.uid
-                new_args = '{} {}'.format(uid, f_args)
+                new_args = '{} {}'.format(obj.uid, f_args)  # Insert UID of each entry one at a time
                 cmd(new_args)
-        break
+        break  # User wants to exit filter mode or command has been run successfully
 
 
 def display_filters(filter_obj):
-    display(filter_obj.objects, extra='Filters:\n' +
-                             colored('{}'.format(filter_obj.filter_string if filter_obj.filters else 'No Filters'),
-                                     'yellow'))
+    """
+    Prints all active filters in filter mode.
+
+    :param filter_obj:      A Filter object which holds the active filters.
+    :return:                None.
+    """
+    display(filter_obj.objects,
+            extra='Filters:\n' + colored('{}'.format(filter_obj.filter_string if filter_obj.filters else 'No Filters'),
+                                         'yellow'))
 
 
 def display(items='', extra=None):
     """
     Display all diary entries and info as a table on the screen.
 
-    :param items: List which sets items to be displayed. Defaults to all entries.
-    :param extra: Extra text to be displayed after the table.
-    :return: None.
+    :param items:           List which sets items to be displayed. Defaults to all entries.
+    :param extra:           Extra text to be displayed after the table.
+    :return:                None.
     """
-    filter_mode = type(items) is list
+    filter_mode = type(items) is list  # Items is a list when run in filter mode
     os.system('cls' if os.name == 'nt' else 'clear')  # For Windows/Mac/Linux compatibility
     if not filter_mode and not len(diary.entries):  # Displaying all diary entries and diary is empty
         cprint('Diary has no entries.\n', 'yellow')
@@ -313,7 +315,7 @@ def display(items='', extra=None):
 
     for new_uid, entry in enumerate(entries):
         if not filter_mode:
-            entry.uid = new_uid + 1
+            entry.uid = new_uid + 1  # Leave UIDs unchanged in filter mode
         due_date = entry.due_date if entry.due_date is not None else NO_DATE
         days_left = entry.days_left if entry.days_left is not None else NO_DATE
         rows.append(['{:0>3}'.format(entry.uid),
@@ -337,6 +339,13 @@ def display(items='', extra=None):
 
 
 def entry_sort_info(entry):
+    """
+    Provides the data of an entry in order as to prioritise sorting of data fields.
+    Required to sort by days remaining then item type then subject then description.
+
+    :param entry:           A DiaryEntry to be processed.
+    :return:                A tuple containing the data of the entry in a sortable order.
+    """
     days_left = entry.days_left if entry.days_left is not None else float('infinity')
     return days_left, entry.item_type, entry.subject, entry.description
 
@@ -345,8 +354,8 @@ def get_text_attributes(row_data):
     """
     Analyse entry data and return list of formatting attributes to add to the row.
 
-    :param row_data: A list of ordered entry data.
-    :return: List of attributes.
+    :param row_data:        A list of ordered entry data.
+    :return:                List of attributes.
     """
     attrs = []
     days_left = row_data[-2]
@@ -381,8 +390,8 @@ def str_to_date(string):
     Convert a string representation of a date to the datetime.date form and supplement missing values with
     corresponding values from today's date.
 
-    :param string: The date string.
-    :return: A datetime.date representation of `string`.
+    :param string:          The date string.
+    :return:                A datetime.date representation of `string`.
     """
     separator = determine_date_separator(string)
     if not string or string is NO_DATE:
@@ -409,8 +418,8 @@ def validate_date(string):
     """
     A condition to check whether a date string can be converted to a valid date.
 
-    :param string: The date str.
-    :return: True/False depending on whether the date string is valid.
+    :param string:          The date str.
+    :return:                True/False depending on whether the date string is valid.
     """
     try:
         _ = str_to_date(string)  # If fails, then invalid date
@@ -423,8 +432,8 @@ def complete_data(data):
     """
     Prompt user to enter previously unentered or invalid data.
 
-    :param data: A dict of required data names and their current values.
-    :return: None
+    :param data:            A dict of required data names and their current values.
+    :return:                None.
     """
     for key, value in data.items():
         if value or (key == PRIORITY and value is 0):
@@ -451,8 +460,8 @@ def format_existing_data(data):
     """
     Convert data to required format for processing.
 
-    :param data: A dict of data names and values.
-    :return: None
+    :param data:            A dict of data names and values.
+    :return:                None.
     """
     for key, value in data.items():
         if not value:
@@ -478,7 +487,8 @@ def format_existing_data(data):
 def match_value_parameter(data):
     """
     Match attribute name from raw text to its ParameterInfo object
-    :param data: A dict containing names and values of data
+
+    :param data:            A dict containing names and values of data
     :return:
     """
     if data.get(ATTRIBUTE, False):  # Check to see if the attribute field has a value
@@ -489,7 +499,7 @@ def prompt():
     """
     Prompt the user for a command to run and any arguments they wish to supply.
 
-    :return: The strings of the command and arguments. Command is None if not supplied.
+    :return:                The strings of the command and arguments. Command is None if not supplied.
     """
     inp = input(PROMPT + '> ')
     if not inp:
@@ -498,6 +508,12 @@ def prompt():
 
 
 def process_input(inp):
+    """
+    Split the raw command string into a command and its arguments.
+
+    :param inp:             A string containing the users command.
+    :return:                A tuple containing the name of the command and a string of arguments.
+    """
     split_input = inp.split(maxsplit=1)  # Separate command from arguments
     command_str = split_input[0]
     try:

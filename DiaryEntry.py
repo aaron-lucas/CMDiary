@@ -93,7 +93,7 @@ class DiaryEntry(object):
 
         :param attr:    The str name of the attribute to edit.
         :param value:   The new value.
-        :return:        None
+        :return:        None.
         """
         if attr in (UID, SUBJECT, DESCRIPTION, DUE_DATE, ITEM_TYPE, PRIORITY):  # Available attributes
             setattr(self, attr, value)
