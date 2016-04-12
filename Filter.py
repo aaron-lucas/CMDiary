@@ -1,5 +1,4 @@
 import re
-from datetime import date
 from DiaryEntry import UID, ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE, PRIORITY, DAYS_LEFT
 ATTR_MSG = 'Attribute does not exist'
 VALUE_MSG = 'Invalid value'

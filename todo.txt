@@ -16,7 +16,7 @@ Current Update:
 v2.3:
 ------
  F      Add filter function to select multiple entries at once                  [C]
- FU     Update help section to contain filter info                              [P]
+ FU     Update help section to contain filter info                              [C]
    *    Update docstrings and comments                                          [ ]
 
 Future Updates:

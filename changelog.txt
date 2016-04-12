@@ -1,6 +1,8 @@
 v2.3:
 ------
 *   Add 'filter' command to select and manipulate multiple entries at once
+*   Help section now only initially displays item types, attributes and commands only
+*   Help section is now in colour
 
 v2.2:
 ------

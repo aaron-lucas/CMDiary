@@ -33,7 +33,7 @@ COLOUR_MAP = {ASSESSMENT: 'red',
 
 NO_DATE = 'N/A'  # String used as placeholder if no date is specified
 CANCEL_CHARACTER = '\\'
-PROMPT = 'CMDiary {}> '.format(VERSION)
+PROMPT = 'CMDiary {}'.format(VERSION)
 
 
 def requires_parameters(*params):
@@ -254,7 +254,7 @@ def filter_entries(filter_str):
     f = Filter(diary.entries, filter_str)
     display_filters(f)
     while True:
-        cmd = get_input('{}filter$ '.format(PROMPT), condition=lambda x: x != '', err_msg='')
+        cmd = get_input('{} (filter mode)> '.format(PROMPT), condition=lambda x: x != '', err_msg='')
         if f.is_valid_condition(cmd):
             try:
                 f.refine(cmd)
@@ -262,14 +262,14 @@ def filter_entries(filter_str):
             except FilterException as fe:
                 cprint(fe.args[0], 'yellow')
             continue
-        elif cmd in ['clear', 'reset']:
+        elif cmd in ['reset', 'r']:
             f.reset()
             display_filters(f)
             continue
         elif cmd in ['l', 'list']:
             display_filters(f)
             continue
-        elif cmd not in ['quit', 'exit', 'cancel']:
+        elif cmd not in ['quit', 'q']:
             cmd, f_args = process_input(cmd)
             if cmd not in [remove, edit, priority, extend]:
                 continue
@@ -295,12 +295,12 @@ def display(items='', extra=None):
     :param extra: Extra text to be displayed after the table.
     :return: None.
     """
-
+    filter_mode = type(items) is list
     os.system('cls' if os.name == 'nt' else 'clear')  # For Windows/Mac/Linux compatibility
-    if items == '' and not len(diary.entries):  # Displaying all diary entries and diary is empty
+    if not filter_mode and not len(diary.entries):  # Displaying all diary entries and diary is empty
         cprint('Diary has no entries.\n', 'yellow')
         return
-    items = items if items != '' else diary.entries
+    items = items if filter_mode else diary.entries
 
     if not len(items):  # Using filter function
         cprint('No entries match these criteria\n', 'yellow')
@@ -312,7 +312,8 @@ def display(items='', extra=None):
     entries = sorted(items, key=entry_sort_info)
 
     for new_uid, entry in enumerate(entries):
-        entry.uid = new_uid + 1
+        if not filter_mode:
+            entry.uid = new_uid + 1
         due_date = entry.due_date if entry.due_date is not None else NO_DATE
         days_left = entry.days_left if entry.days_left is not None else NO_DATE
         rows.append(['{:0>3}'.format(entry.uid),
@@ -490,7 +491,7 @@ def prompt():
 
     :return: The strings of the command and arguments. Command is None if not supplied.
     """
-    inp = input(PROMPT)
+    inp = input(PROMPT + '> ')
     if not inp:
         return None, ''
     return process_input(inp)
