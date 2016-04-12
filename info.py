@@ -1,17 +1,39 @@
 from collections import OrderedDict
-from termcolor import cprint
+from termcolor import cprint, colored
+
+
+def cmd(string):
+    return colored(string, 'magenta')
+
+
+def arg(string):
+    return colored(string, 'red')
+
+
+def title(string):
+    return colored(string, attrs=['bold'])
+
+
+def important(string):
+    return colored(string, 'yellow')
+
 
 # A dict of commands and their respective help strings
-COMMANDS = OrderedDict([('add',      '(a)dd       [type] [subject] [description] [due date] - add new entry'),
-                        ('remove',   '(r)emove    [uid] - remove an entry'),
-                        ('edit',     '(e)dit      [uid] [attr] [value] - edit an entry\'s data'),
-                        ('extend',   'e(x)tend    [uid] [days] - change an entry\'s due date by (days) days'),
-                        ('list',     '(l)ist      list all diary entries'),
-                        ('priority', '(p)riority  [uid] [0:1] - Gives or takes priority of an entry. An entry with\n'
-                                     '            priority will appear in bold.'),
-                        ('quit',     '(q)uit      quit CMDiary'),
-                        ('help',     "(h)elp      [command : 'types' : 'attrs' : 'date'] - display command info  "),
-                        ('cancel',   "Use '\\' to cancel a prompt and return to the main screen")])
+COMMANDS = OrderedDict([('add',      cmd('(a)dd') + arg('       [type] [subject] [description] [due date]') +
+                         ' - add new entry'),
+                        ('remove',   cmd('(r)emove') + arg('    [uid]') + ' - remove an entry'),
+                        ('edit',     cmd('(e)dit') + arg('      [uid] [attr] [value]') + ' - edit an entry\'s data'),
+                        ('extend',   cmd('e(x)tend') + arg('    [uid] [days]') +
+                         ' - change an entry\'s due date by (days) days'),
+                        ('list',     cmd('(l)ist') + '      list all diary entries'),
+                        ('priority', cmd('(p)riority') + arg('  [uid] [0:1]') +
+                         ' - Gives or takes priority of an entry. An entry with\n' +
+                         '              priority will appear in bold.'),
+                        ('quit',     cmd('(q)uit') + '      quit CMDiary'),
+                        ('help',     cmd('(h)elp') + arg("      [command : 'types' : 'attrs' : 'date']") +
+                         ' - display command info'),
+                        ('cancel',   'Use ' + cmd('\\') + ' to ' + arg('cancel') +
+                         ' a prompt and return to the main screen')])
 
 # A list of available item types
 ITEM_TYPES = ['(h)omework', '(a)ssessment', '(n)ote']
@@ -29,27 +51,31 @@ DATE_FORMATTING = '* Dates can be represented by using 1 to 3 numbers, separated
                   '* If a year is specified, it must be in full, 4-digit format or it will not be recognised.'
 
 # Create help strings using the above three lists/strings
-item_types_help = 'Item Types: {}'.format(', '.join(ITEM_TYPES))
-attributes_help = 'Attributes: {}'.format(', '.join(ATTRIBUTES))
-date_formatting_help = 'Date formatting:\n{}'.format(DATE_FORMATTING)
+item_types_help = important('Item Types: ') + '{}'.format(', '.join(ITEM_TYPES))
+attributes_help = important('Attributes: ') + '{}'.format(', '.join(ATTRIBUTES))
+date_formatting_help = important('Date formatting:\n') + DATE_FORMATTING
 
 
 def get_info(item=None):
     """
     Lookup and print help strings.
 
-    :param item:    A str to fing a help section for.
+    :param item:    A str to find a help section for.
     :return:        None
     """
     if item is None:  # Print all help
-        print('\nCMDiary Help\n-----------------------')
+        print('\n' + title('CMDiary Help\n-----------------------'))
         print(item_types_help)
         print(attributes_help)
         print()
         for info in COMMANDS.values():
             print(info)
         print()
-        print(date_formatting_help)
+        print('There are additional help sections on the following topics:\n* ' +
+              important('Date Formatting ') + '(' +
+              cmd('help date') + ')\n* ' +
+              important('Use of the filter function ') + '(' +
+              cmd('help filter') + ')')
     elif item in ('t', 'types'):
         print(item_types_help)
     elif item in ('attrs', 'attributes', 'attr'):
