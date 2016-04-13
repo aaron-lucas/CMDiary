@@ -13,16 +13,22 @@ Every Version:
    *    Update changelog.txt                                                    [C]
 
 Current Update:
+v2.3.1:
+--------
+B U   ! Change reset command in filter mode to clear to fix clash               [C]
+B     ! Fix remove command in filter mode to apply to entries                   [C]
+
+
+Future Updates:
+
+
+Old Updates:
 v2.3:
 ------
  F      Add filter function to select multiple entries at once                  [C]
  FU     Update help section to contain filter info                              [C]
    *    Update docstrings and comments                                          [C]
 
-Future Updates:
-
-
-Old Updates:
 v2.2:
 ------
   U     Change random UIDs to order of display                                  [C]

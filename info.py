@@ -61,7 +61,7 @@ FILTER_HELP = '* In filter mode, you can specify conditions to select multiple e
               important('Operators') + ':\n    =    Equal to\n    >    Greater than\n    <    Less than\n' \
                                        '    :    Contains\n' + \
               important('Extra Commands:') + '\n ' + cmd('(q)uit') + '  Quit filter mode\n ' + \
-              cmd('(l)ist') + '  List entries currently selected by filter\n ' + cmd('(r)eset') + ' Reset filters'
+              cmd('(l)ist') + '  List entries currently selected by filter\n ' + cmd('(c)lear') + ' Clear all filters'
 
 # Create help strings using the above three lists/strings
 item_types_help = important('Item Types: ') + '{}'.format(', '.join(ITEM_TYPES))
