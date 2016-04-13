@@ -9,14 +9,14 @@ TODO FILE
 
 Every Version:
 ---------------
-   *    Update version number                                                   [ ]
-   *    Update changelog.txt                                                    [ ]
+   *    Update version number                                                   [C]
+   *    Update changelog.txt                                                    [C]
 
 Current Update:
 v2.3.1:
 --------
-B U   ! Change reset command in filter mode to clear to fix clash               [ ]
-B     ! Fix remove command in filter mode to apply to entries                   [ ]
+B U   ! Change reset command in filter mode to clear to fix clash               [C]
+B     ! Fix remove command in filter mode to apply to entries                   [C]
 
 
 Future Updates:

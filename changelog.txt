@@ -1,3 +1,8 @@
+v2.3.1:
+--------
+*   Change 'reset' command in filter mode to 'clear' to resolve abbreviation conflict with 'remove'
+*   Fixed bug in filter mode which did not allow all entries to be removed at once
+
 v2.3:
 ------
 *   Add 'filter' command to select and manipulate multiple entries at once
