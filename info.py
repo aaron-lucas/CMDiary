@@ -57,6 +57,8 @@ FILTER_HELP = '* In filter mode, you can specify conditions to select multiple e
               '* Conditions can be entered at the prompt until a selection has been made.\n' + \
               '* The ' + cmd('remove') + ', ' + cmd('edit') + ', ' + cmd('extend') + ' and ' + cmd('priority') + \
               ' commands can then be used, without the need to specify uids.\n' + \
+              '* Entries with the due date or days left displayed as \'N/A\' can be selected with \'' + \
+              cmd('due=none') + '\'.\n' + \
               important('Attributes') + ': (u)id, (s)ubject, (d)escription, (due)date, (days)left.\n' + \
               important('Operators') + ':\n    =    Equal to\n    >    Greater than\n    <    Less than\n' \
                                        '    :    Contains\n' + \

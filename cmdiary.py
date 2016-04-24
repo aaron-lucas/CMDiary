@@ -1,6 +1,6 @@
 # CMDiary - a command-line diary application
 
-VERSION = 'v2.3.1'
+VERSION = 'v2.4'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
@@ -530,7 +530,7 @@ def process_input(inp):
     except KeyError:
         cprint("'{}' is not a valid command".format(command_str), 'yellow')
         return None, ''
-    arg_string = split_input[1] if len(split_input) == 2 else ''  # Check is arguments were supplied
+    arg_string = split_input[1] if len(split_input) == 2 else ''  # Check if arguments were supplied
     return command_str, arg_string
 
 
@@ -539,6 +539,14 @@ def quit_cmdiary(*ignore):
     if os.name == 'nt':  # Colorama only required on Windows machines
         deinit()  # Colorama deinit function
     quit()
+
+
+def switch_diary(name):
+    global diary
+    if name == 'test':
+        diary = Diary('test_data.pickle')
+    elif name == 'main':
+        diary = Diary('data.pickle')
 
 # Initialise diary object
 diary = Diary()
@@ -615,7 +623,9 @@ COMMANDS = {'add': add, 'a': add,
             'list': display, 'l': display,
             'help': get_info, 'h': get_info,
             'priority': priority, 'p': priority,
-            'filter': filter_entries, 'f': filter_entries}
+            'filter': filter_entries, 'f': filter_entries,
+
+            'switchto': switch_diary}
 
 # Run the diary
 if __name__ == '__main__':

@@ -29,11 +29,12 @@ class Diary(object):
     This class also handles local storing and fetching of all DiaryEntry data.
     """
 
-    def __init__(self):
+    def __init__(self, data_file='data.pickle'):
         """
         Load any locally stored data into the `entries` variable.
         :return: None.
         """
+        self.data_file = data_file
         self.entries = self.load_data()
 
     def load_data(self):
@@ -42,16 +43,16 @@ class Diary(object):
         :return: A list of loaded DiaryEntry objects.
         """
         entry_data = []
-        if not os.path.isfile('data.pickle'):
-            open('data.pickle', 'w').close()  # Create file if none exists
-        with open('data.pickle', 'rb') as source:
+        if not os.path.isfile(self.data_file):
+            open(self.data_file, 'w').close()  # Create file if none exists
+        with open(self.data_file, 'rb') as source:
             try:
                 while True:
                     entry_data.append(pickle.load(source))
             except EOFError:  # Stop looping through data at end of file
                 pass
 
-        return [DiaryEntry(self, **dataset) for dataset in entry_data]  # Create DiaryEntrys from stored data
+        return [DiaryEntry(**dataset) for dataset in entry_data]  # Create DiaryEntrys from stored data
 
     @property
     def taken_uids(self):
@@ -69,7 +70,8 @@ class Diary(object):
         :param due_date:    A datetime.date object specifying the due date of the entry.
         :return:            None.
         """
-        self.entries.append(DiaryEntry(self, item_type, subject, description, due_date))
+        uid = self.generate_initial_uid()
+        self.entries.append(DiaryEntry(uid, item_type, subject, description, due_date))
 
     @update_data
     def remove(self, *uids):

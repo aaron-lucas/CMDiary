@@ -9,17 +9,18 @@ TODO FILE
 
 Every Version:
 ---------------
-   *    Update version number                                                   [ ]
+   *    Update version number                                                   [C]
    *    Update changelog.txt                                                    [ ]
 
 Current Update:
 v2.4:
 --------
 B   !   Fix crash when specifying a condition in the filter command             [C]
-   *    Make Diary instance set an Entry's uid                                  [ ]
+   *    Make Diary instance set an Entry's uid                                  [C]
    *    Clean up code and split up long functions                               [C]
   U     Allow selection of entries with no due date in filter mode              [C]
  FU     Add new filter operator (!) for selections not equal to the condition   [ ]
+ F *    Add test diary to allow ease of testing new features                    [C]
 
 
 Future Updates:
