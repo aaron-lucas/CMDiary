@@ -249,19 +249,16 @@ def filter_entries(filter_str=''):
         cmd = get_input('{} (filter mode)> '.format(PROMPT),
                         condition=lambda x: x != '',  # Do not accept blank string
                         err_msg='')  # No error message if blank string is entered
+
         if f.is_valid_condition(cmd):
             handle_add_filter_condition(f, cmd)
-
         elif cmd in ['quit', 'q']:
             break
-
         elif cmd in ['clear', 'c']:
             f.reset()
             display_filters(f)
-
         elif cmd in ['l', 'list']:
             display_filters(f)
-
         else:  # Otherwise a diary command has been entered
             cmd, f_args = process_input(cmd)  # Separate command and arguments
             if cmd in [remove, edit, priority, extend]:  # These are the only commands available in filter mode
@@ -291,48 +288,58 @@ def display_filters(filter_obj):
                                          'yellow'))
 
 
-def display(items='', extra=None):
+def create_table(items=[], filter_mode=False):
     """
-    Display all diary entries and info as a table on the screen.
+    Formats a list of diary entries into table form.
 
-    :param items:           List which sets items to be displayed. Defaults to all entries.
-    :param extra:           Extra text to be displayed after the table.
-    :return:                None.
+    :param items:           The list of entries to format.
+    :param filter_mode:     Specifies whether CMDiary is currently in filter mode.
+    :return:                A formatted str which will display a table when printed.
     """
-    filter_mode = type(items) is list  # Items is a list when run in filter mode
-    os.system('cls' if os.name == 'nt' else 'clear')  # For Windows/Mac/Linux compatibility
-    if not filter_mode and not len(diary.entries):  # Displaying all diary entries and diary is empty
-        cprint('Diary has no entries.\n', 'yellow')
-        return
-    items = items if filter_mode else diary.entries
-
-    if not len(items):  # Using filter function
-        cprint('No entries match these criteria\n', 'yellow')
-        print(extra + '\n')
-        return
-
     headers = ('UID', 'Type', 'Subject', 'Description', 'Due Date', 'Days Left')
     rows = []
-    entries = sorted(items, key=entry_sort_info)
+    sorted_items = sorted(items, key=entry_sort_info)
 
-    for new_uid, entry in enumerate(entries):
-        if not filter_mode:
-            entry.uid = new_uid + 1  # Leave UIDs unchanged in filter mode
+    for index, entry in enumerate(sorted_items):
+        if not filter_mode:  # Leave UIDs unchanged in filter mode otherwise they are updated to match their index
+            entry.uid = index + 1
         due_date = entry.due_date if entry.due_date is not None else NO_DATE
         days_left = entry.days_left if entry.days_left is not None else NO_DATE
-        rows.append(['{:0>3}'.format(entry.uid),
+        rows.append(['{:0>3}'.format(entry.uid),  # Ensure 3 digit UIDs,
                      entry.item_type,
                      entry.subject,
                      entry.description,
                      date_to_str(due_date),
                      days_left,
-                     entry.priority])  # Format some data to str
+                     entry.priority])
 
-    rows = [[colored(str(attr), COLOUR_MAP[row[1]],
-                     attrs=get_text_attributes(row)) for attr in row[:-1]]  # Do not display priority status
-            for row in rows]  # Colour-code rows based on item type
-
+    rows = [[colored(str(cell), color=COLOUR_MAP[row[1]], attrs=get_text_attributes(row))
+             for cell in row[:-1]]  # Do not explicitly display priority state
+            for row in rows]  # Colourise each entry, however only the actual entry text not the table characters
     table = tabulate(rows, headers)
+    return table
+
+
+def display(filter_items=None, extra=None):
+    """
+    Display all diary entries and info as a table on the screen.
+
+    :param filter_items:    List which specifies items to be displayed. Will default to all entries.
+    :param extra:           Extra text to be displayed after the table.
+    :return:                None.
+    """
+    filter_mode = filter_items is not None
+    items = filter_items if filter_mode else diary.entries
+    os.system('cls' if os.name == 'nt' else 'clear')  # For Windows/Mac/Linux compatibility
+
+    if not items:
+        message = 'No entries match these criteria\n' if filter_mode else 'Diary has no entries\n'
+        cprint(message, 'yellow')
+        if extra is not None:
+            print(extra + '\n')
+        return
+
+    table = create_table(items, filter_mode)
     sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=24,
                                                     cols=max((len(table.split('\n')[1])), 80)))  # Resize window
     print(table + '\n')  # Newline after table is more aesthetically pleasing.
@@ -620,10 +627,15 @@ if __name__ == '__main__':
             command, args = prompt()
             if command is None:
                 continue
+
+            # These commands have slightly different parameters so they must be changed
             if command is get_info:
-                args = args if args else None  # get_info has slightly different parameter requirements
+                args = args if args else None
+            if command is display:
+                args = None
+
             command(args)
-            if command is not get_info:
+            if command not in [get_info, display]:
                 display()
     except KeyboardInterrupt:
-        quit_cmdiary()  # Exit without crash info
+        quit_cmdiary()  # Exit without crash info and perform cleanup

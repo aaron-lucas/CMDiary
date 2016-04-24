@@ -39,7 +39,7 @@ def filter_function(function):
                 obj_value = getattr(obj, attr)
             except AttributeError:  # If invalid attribute is specified
                 return ATTR_MSG
-            if obj_value is None:  # Skip over blank values
+            if obj_value is None and value.lower() != 'none':  # Skip over blank values if not looking for them
                 continue
             try:
                 if function(self, obj_value, value):
