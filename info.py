@@ -57,9 +57,11 @@ FILTER_HELP = '* In filter mode, you can specify conditions to select multiple e
               '* Conditions can be entered at the prompt until a selection has been made.\n' + \
               '* The ' + cmd('remove') + ', ' + cmd('edit') + ', ' + cmd('extend') + ' and ' + cmd('priority') + \
               ' commands can then be used, without the need to specify uids.\n' + \
+              '* Entries with the due date or days left displayed as \'N/A\' can be selected with \'' + \
+              cmd('due=none') + '\'.\n' + \
               important('Attributes') + ': (u)id, (s)ubject, (d)escription, (due)date, (days)left.\n' + \
               important('Operators') + ':\n    =    Equal to\n    >    Greater than\n    <    Less than\n' \
-                                       '    :    Contains\n' + \
+              '    :    Contains\n' + 'Operators can be prefixed by  !  to negate their selection\n' + \
               important('Extra Commands:') + '\n ' + cmd('(q)uit') + '  Quit filter mode\n ' + \
               cmd('(l)ist') + '  List entries currently selected by filter\n ' + cmd('(c)lear') + ' Clear all filters'
 
@@ -76,8 +78,8 @@ def get_info(item=None):
     :param item:    A str to find a help section for.
     :return:        None
     """
+    print('\n' + title('CMDiary Help\n-----------------------'))
     if item is None:  # Print all help
-        print('\n' + title('CMDiary Help\n-----------------------'))
         print(item_types_help)
         print(attributes_help)
         print()

@@ -13,16 +13,25 @@ Every Version:
    *    Update changelog.txt                                                    [C]
 
 Current Update:
-v2.3.1:
+v2.4:
 --------
-B U   ! Change reset command in filter mode to clear to fix clash               [C]
-B     ! Fix remove command in filter mode to apply to entries                   [C]
+B   !   Fix crash when specifying a condition in the filter command             [C]
+   *    Make Diary instance set an Entry's uid                                  [C]
+   *    Clean up code and split up long functions                               [C]
+  U     Allow selection of entries with no due date in filter mode              [C]
+ FU     Add new filter operator (!) for selections not equal to the condition   [C]
+ F *    Add test diary to allow ease of testing new features                    [C]
 
 
 Future Updates:
 
 
 Old Updates:
+v2.3.1:
+--------
+B U !   Change reset command in filter mode to clear to fix clash               [C]
+B   !   Fix remove command in filter mode to apply to entries                   [C]
+
 v2.3:
 ------
  F      Add filter function to select multiple entries at once                  [C]

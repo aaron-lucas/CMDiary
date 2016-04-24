@@ -77,14 +77,13 @@ class DiaryEntry(object):
     item_type = CheckedVar(str, [HOMEWORK, ASSESSMENT, NOTE])
     priority = CheckedVar(int, default=0, options=[0, 1])
 
-    def __init__(self, owner, item_type, subject, description, due_date, uid=None, priority=0):
+    def __init__(self, uid, item_type, subject, description, due_date, priority=0):
         """Initialise instance variables."""
-        self.owner = owner
+        self.uid = uid
         self.item_type = item_type
         self.subject = subject
         self.description = description
         self.due_date = due_date
-        self.uid = owner.generate_initial_uid() if uid is None else uid
         self.priority = priority
 
     def edit(self, attr, value):

@@ -1,7 +1,16 @@
+v2.4:
+------
+*   Fix crash when specifying a condition alongside the filter command
+*   Code cleanup and separation
+*   Allow selection of entries in filter mode which have no due date
+*   Add negation operator in filter mode
+*   Add secret testing diary
+*   Add title to all help sections
+
 v2.3.1:
 --------
 *   Change 'reset' command in filter mode to 'clear' to resolve abbreviation conflict with 'remove'
-*   Fixed bug in filter mode which did not allow all entries to be removed at once
+*   Fix bug in filter mode which did not allow all entries to be removed at once
 
 v2.3:
 ------

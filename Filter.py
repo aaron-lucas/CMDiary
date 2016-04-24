@@ -1,5 +1,6 @@
 import re
 from DiaryEntry import UID, ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE, PRIORITY, DAYS_LEFT
+
 ATTR_MSG = 'Attribute does not exist'
 VALUE_MSG = 'Invalid value'
 FILTER_ATTRIBUTES = {
@@ -26,23 +27,27 @@ def filter_function(function):
     A decorator which filters through the entries according to a condition provided by the decorated function.
     The decorated function should have the signature decorated_function(self, obj_value, filter_value) to specify
     the condition between the value given and that of the object but will end up with the signature
-    decorated_function(attr, value) to determine the attribute and value to compare.
+    decorated_function(attr, value, negate=False) to determine the attribute and value to compare.
 
     :param function:        The function to be decorated.
     :return:                A decorated function.
     """
-    def wrapper(self, attr, value):
+    def wrapper(self, attr, value, negate=False):
         matched = []
         for obj in self.objects:
             try:
                 obj_value = getattr(obj, attr)
             except AttributeError:  # If invalid attribute is specified
                 return ATTR_MSG
-            if obj_value is None:  # Skip over blank values
+            if obj_value is None and value.lower() != 'none':  # Skip over blank values if not looking for them
                 continue
             try:
-                if function(self, obj_value, value):
-                    matched.append(obj)
+                if negate:
+                    if not function(self, obj_value, value):
+                        matched.append(obj)
+                else:
+                    if function(self, obj_value, value):
+                        matched.append(obj)
             except ValueError:  # If type conversion fails
                 return VALUE_MSG
             except TypeError:  # If a date is converted to int
@@ -59,15 +64,13 @@ class Filter:
     :param objects:         A list of objects to be filtered.
     :param initial:         An initial filter condition string.
     """
-    condition_format = re.compile('(.*?)([=<>:])(.*)')
+    condition_format = re.compile('(.*?)\s*(!?[=<>:])(.*)')
 
-    def __init__(self, objects, initial=None):
+    def __init__(self, objects):
         """Initialise instance variables."""
         self.original = objects  # Allows resetting of conditions
         self.objects = objects
         self.filters = []
-        if initial is not None:
-            self.refine(initial)
 
     def refine(self, condition):
         """
@@ -100,18 +103,24 @@ class Filter:
         Maps operators to filter functions and selects all objects which match the condition.
 
         :param attr:        The name of the attribute of the object to compare.
-        :param operator:    The operation to perform (either =, <, >, :).
+        :param operator:    The operation to perform (either =, <, >, :, possibly with a ! prefixed).
         :param value:       The value to compare to.
         :return:            A list of matched objects or an error string.
         """
+        if '!' in operator:
+            operator = operator.strip('!')
+            negate = True
+        else:
+            negate = False
+
         if operator == '=':
-            return self.equal_to(attr, value)
-        if operator == '>':
-            return self.greater_than(attr, value)
-        if operator == '<':
-            return self.less_than(attr, value)
-        if operator == ':':
-            return self.contains(attr, value)
+            return self.equal_to(attr, value, negate)
+        elif operator == '>':
+            return self.greater_than(attr, value, negate)
+        elif operator == '<':
+            return self.less_than(attr, value, negate)
+        elif operator == ':':
+            return self.contains(attr, value, negate)
 
     def reset(self):
         """
@@ -133,9 +142,10 @@ class Filter:
 
     # The following functions define conditions for the operators however are decorated to actually
     # filter the list of objects
-    # Signature after decoration is function(self, attr, value).
+    # Signature after decoration is function(self, attr, value, negate=False).
     # :param attr:          The name of the attribute to compare.
     # :param value:         The given value to compare
+    # :param negate:        Determines whether the condition should be negated
     # :return:
 
     @filter_function
