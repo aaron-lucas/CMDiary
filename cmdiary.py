@@ -241,40 +241,42 @@ def filter_entries(filter_str=''):
     :param filter_str:      An optional initial filter condition string.
     :return:                None.
     """
-    if not filter_str:  # No initial filter condition given
-        filter_str = None
-    f = Filter(list(diary.entries), filter_str)  # Pass a copy of diary.entries to prevent skipping when using `remove`
-    display_filters(f)
+    f = Filter(list(diary.entries))  # Pass a copy of diary.entries to prevent skipping when using `remove`
+    if filter_str:
+        handle_add_filter_condition(f, filter_str)
+
     while True:
         cmd = get_input('{} (filter mode)> '.format(PROMPT),
                         condition=lambda x: x != '',  # Do not accept blank string
                         err_msg='')  # No error message if blank string is entered
         if f.is_valid_condition(cmd):
-            try:
-                f.refine(cmd)
-                display_filters(f)
-            except FilterException as fe:
-                cprint(fe.args[0], 'yellow')
-            continue
+            handle_add_filter_condition(f, cmd)
+
+        elif cmd in ['quit', 'q']:
+            break
 
         elif cmd in ['clear', 'c']:
             f.reset()
             display_filters(f)
-            continue
 
         elif cmd in ['l', 'list']:
             display_filters(f)
-            continue
 
-        elif cmd not in ['quit', 'q']:  # Otherwise a diary command has been entered
+        else:  # Otherwise a diary command has been entered
             cmd, f_args = process_input(cmd)  # Separate command and arguments
-            if cmd not in [remove, edit, priority, extend]:  # These are the only commands available in filter mode
-                continue
+            if cmd in [remove, edit, priority, extend]:  # These are the only commands available in filter mode
+                for obj in f.objects:
+                    new_args = '{} {}'.format(obj.uid, f_args)  # Insert UID of each entry one at a time
+                    cmd(new_args)
+                break
 
-            for obj in f.objects:
-                new_args = '{} {}'.format(obj.uid, f_args)  # Insert UID of each entry one at a time
-                cmd(new_args)
-        break  # User wants to exit filter mode or command has been run successfully
+
+def handle_add_filter_condition(filter, condition):
+    try:
+        filter.refine(condition)
+        display_filters(filter)
+    except FilterException as fe:
+        cprint(fe.args[0], 'yellow')
 
 
 def display_filters(filter_obj):

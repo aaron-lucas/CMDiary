@@ -13,7 +13,7 @@ Every Version:
    *    Update changelog.txt                                                    [ ]
 
 Current Update:
-B   !   Fix crash when specifying a condition in the filter command             [ ]
+B   !   Fix crash when specifying a condition in the filter command             [C]
    *    Make Diary instance set an Entry's uid                                  [ ]
    *    Clean up code and split up long functions                               [ ]
 

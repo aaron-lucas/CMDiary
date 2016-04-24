@@ -1,5 +1,6 @@
 import re
 from DiaryEntry import UID, ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE, PRIORITY, DAYS_LEFT
+
 ATTR_MSG = 'Attribute does not exist'
 VALUE_MSG = 'Invalid value'
 FILTER_ATTRIBUTES = {
@@ -61,13 +62,11 @@ class Filter:
     """
     condition_format = re.compile('(.*?)([=<>:])(.*)')
 
-    def __init__(self, objects, initial=None):
+    def __init__(self, objects):
         """Initialise instance variables."""
         self.original = objects  # Allows resetting of conditions
         self.objects = objects
         self.filters = []
-        if initial is not None:
-            self.refine(initial)
 
     def refine(self, condition):
         """
