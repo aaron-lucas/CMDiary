@@ -15,7 +15,7 @@ def update_data(func):
     """
     def wrapper(self, *args, **kwargs):
         retval = func(self, *args, **kwargs)
-        with open('data.pickle', 'wb') as file:
+        with open(self.data_file, 'wb') as file:
             for entry in self.entries:
                 file.write(pickle.dumps(entry.data, pickle.HIGHEST_PROTOCOL))
         return retval
