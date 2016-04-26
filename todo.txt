@@ -15,7 +15,7 @@ Every Version:
 Current Update:
 v2.4.1:
 --------
-B U     In filter mode, allow selection of due dates using displayed format     [ ]
+B U     In filter mode, allow selection of due dates using displayed format     [C]
 
 
 Future Updates:
