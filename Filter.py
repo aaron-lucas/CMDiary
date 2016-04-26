@@ -1,4 +1,5 @@
 import re
+from datetime import date
 from DiaryEntry import UID, ITEM_TYPE, SUBJECT, DESCRIPTION, DUE_DATE, PRIORITY, DAYS_LEFT
 
 ATTR_MSG = 'Attribute does not exist'
@@ -12,6 +13,7 @@ FILTER_ATTRIBUTES = {
     'priority': PRIORITY, 'p': PRIORITY,
     'daysleft': DAYS_LEFT, 'days': DAYS_LEFT
 }
+DATE_FORMAT = '%d/%m/%Y'
 
 
 class FilterException(Exception):
@@ -150,6 +152,8 @@ class Filter:
 
     @filter_function
     def equal_to(self, obj_val, filter_val):
+        if type(obj_val) == date:
+            return obj_val.strftime(DATE_FORMAT) == str(filter_val)
         return str(obj_val).lower() == str(filter_val).lower()
 
     @filter_function
@@ -162,4 +166,6 @@ class Filter:
 
     @filter_function
     def contains(self, obj_val, filter_val):
+        if type(obj_val) == date:
+            return str(filter_val) in obj_val.strftime(DATE_FORMAT)
         return str(filter_val).lower() in str(obj_val).lower()

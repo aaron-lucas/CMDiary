@@ -13,6 +13,15 @@ Every Version:
    *    Update changelog.txt                                                    [C]
 
 Current Update:
+v2.4.1:
+--------
+B U     In filter mode, allow selection of due dates using displayed format     [C]
+
+
+Future Updates:
+
+
+Old Updates:
 v2.4:
 --------
 B   !   Fix crash when specifying a condition in the filter command             [C]
@@ -22,11 +31,6 @@ B   !   Fix crash when specifying a condition in the filter command             
  FU     Add new filter operator (!) for selections not equal to the condition   [C]
  F *    Add test diary to allow ease of testing new features                    [C]
 
-
-Future Updates:
-
-
-Old Updates:
 v2.3.1:
 --------
 B U !   Change reset command in filter mode to clear to fix clash               [C]
@@ -53,7 +57,7 @@ v2.1:
  F      Priority feature which bolds important entries                          [C]
  F      Allow scheduling of tasks                                               [X]
  FU     Allow custom types and colours                                          [X]
-   *?   Write tests                                                             [P]
+   *?   Write tests                                                             [X]
 
 v2.0.5:
 --------
