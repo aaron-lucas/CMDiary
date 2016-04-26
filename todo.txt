@@ -9,10 +9,19 @@ TODO FILE
 
 Every Version:
 ---------------
-   *    Update version number                                                   [C]
-   *    Update changelog.txt                                                    [C]
+   *    Update version number                                                   [ ]
+   *    Update changelog.txt                                                    [ ]
 
 Current Update:
+v2.4.1:
+--------
+B U     In filter mode, allow selection of due dates using displayed format     [ ]
+
+
+Future Updates:
+
+
+Old Updates:
 v2.4:
 --------
 B   !   Fix crash when specifying a condition in the filter command             [C]
@@ -22,11 +31,6 @@ B   !   Fix crash when specifying a condition in the filter command             
  FU     Add new filter operator (!) for selections not equal to the condition   [C]
  F *    Add test diary to allow ease of testing new features                    [C]
 
-
-Future Updates:
-
-
-Old Updates:
 v2.3.1:
 --------
 B U !   Change reset command in filter mode to clear to fix clash               [C]
