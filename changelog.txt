@@ -1,3 +1,7 @@
+v2.4.1:
+--------
+*   Allow selections of dates in filter mode using displayed date format
+
 v2.4:
 ------
 *   Fix crash when specifying a condition alongside the filter command

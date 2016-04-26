@@ -57,7 +57,7 @@ v2.1:
  F      Priority feature which bolds important entries                          [C]
  F      Allow scheduling of tasks                                               [X]
  FU     Allow custom types and colours                                          [X]
-   *?   Write tests                                                             [P]
+   *?   Write tests                                                             [X]
 
 v2.0.5:
 --------
