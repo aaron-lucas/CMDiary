@@ -9,8 +9,8 @@ TODO FILE
 
 Every Version:
 ---------------
-   *    Update version number                                                   [ ]
-   *    Update changelog.txt                                                    [ ]
+   *    Update version number                                                   [C]
+   *    Update changelog.txt                                                    [C]
 
 Current Update:
 v2.4.1:
