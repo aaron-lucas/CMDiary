@@ -13,15 +13,21 @@ Every Version:
    *    Update changelog.txt                                                    [C]
 
 Current Update:
+v2.4.2:
+--------
+B       List command no longer resets terminal height allowing proper use in
+        full screen mode                                                        [C]
+
+
+Future Updates:
+ F      Suggest correct commands if incorrectly typed                           [ ]
+
+
+Old Updates:
 v2.4.1:
 --------
 B U     In filter mode, allow selection of due dates using displayed format     [C]
 
-
-Future Updates:
-
-
-Old Updates:
 v2.4:
 --------
 B   !   Fix crash when specifying a condition in the filter command             [C]

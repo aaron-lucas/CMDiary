@@ -1,6 +1,6 @@
 # CMDiary - a command-line diary application
 
-VERSION = 'v2.4.1'
+VERSION = 'v2.4.2'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
@@ -340,7 +340,9 @@ def display(filter_items=None, extra=None):
         return
 
     table = create_table(items, filter_mode)
-    sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=24,
+    # Get current terminal height so it is not changed. This allows proper functioning when in full screen mode on mac.
+    rows = os.popen('stty size', 'r').read().split()[0]
+    sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=rows,
                                                     cols=max((len(table.split('\n')[1])), 80)))  # Resize window
     print(table + '\n')  # Newline after table is more aesthetically pleasing.
     if extra is not None:

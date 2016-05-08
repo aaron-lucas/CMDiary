@@ -1,3 +1,7 @@
+v2.4.2:
+--------
+*   List command no longer resets terminal height allowing proper use in full screen mode
+
 v2.4.1:
 --------
 *   Allow selections of dates in filter mode using displayed date format
