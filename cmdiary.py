@@ -1,6 +1,6 @@
 # CMDiary - a command-line diary application
 
-VERSION = 'v2.4.2'
+VERSION = 'v2.5'
 AUTHOR = 'Aaron Lucas'
 GITHUB_REPO = 'https://github.com/aaron-lucas/CMDiary'
 
@@ -244,6 +244,8 @@ def filter_entries(filter_str=''):
     f = Filter(list(diary.entries))  # Pass a copy of diary.entries to prevent skipping when using `remove`
     if filter_str:
         handle_add_filter_condition(f, filter_str)
+    else:
+        display_filters(f)
 
     while True:
         cmd = get_input('{} (filter mode)> '.format(PROMPT),
