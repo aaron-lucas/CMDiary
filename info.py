@@ -27,8 +27,7 @@ COMMANDS = OrderedDict([('add',      cmd('(a)dd') + arg('       [type] [subject]
                          ' - change an entry\'s due date by (days) days'),
                         ('list',     cmd('(l)ist') + '      list all diary entries'),
                         ('priority', cmd('(p)riority') + arg('  [uid] [0:1]') +
-                         ' - Gives or takes priority of an entry. An entry with\n' +
-                         '            priority will appear in bold.'),
+                         ' - Gives or takes priority of an entry. An entry with priority will appear in bold.'),
                         ('filter',   cmd('(f)ilter') + arg('    [condition]') +
                          ' - enter filter mode to select multiple entries at once'),
                         ('quit',     cmd('(q)uit') + '      quit CMDiary'),
