@@ -10,12 +10,13 @@ TODO FILE
 Every Version:
 ---------------
    *    Update version number                                                   [C]
-   *    Update changelog.txt                                                    [ ]
+   *    Update changelog.txt                                                    [C]
+   *    Revert to main diary                                                    [C]
 
 Current Update:
 v2.5:
 ------
- F      Suggest correct commands if incorrectly typed                           [ ]
+ F      Suggest correct commands if incorrectly typed                           [C]
   U     Enter filter mode without initial condition goes to filter ui           [C]
 
 Future Updates:

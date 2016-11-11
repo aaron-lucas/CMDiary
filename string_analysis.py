@@ -90,7 +90,7 @@ def get_best_match(test_str):
         for item in result_set.items():
             #print("{}: {}".format(item[0], item[1]))
             name, value = item
-            results[name] += value/medians[index]
+            results[name] += value/(medians[index] if medians[index] != 0 else 1)
 
     results = OrderedDict(sorted(results.items(), key=lambda t: t[1], reverse=True))
     return max(results, key=lambda x: results[x])
@@ -100,4 +100,4 @@ def get_best_match(test_str):
     #     print("{}: {}".format(item[0], item[1]))
     # print('Best Match: {}'.format(max(results, key=lambda x: results[x])))
 
-get_best_match(input('String Analysis > '))
+# get_best_match(input('String Analysis > '))

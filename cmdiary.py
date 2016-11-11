@@ -9,6 +9,7 @@ import re
 import os
 import sys
 from collections import OrderedDict
+from string_analysis import get_best_match
 
 from termcolor import cprint, colored
 from tabulate import tabulate
@@ -533,7 +534,14 @@ def process_input(inp):
         command_str = COMMANDS[command_str]
     except KeyError:
         cprint("'{}' is not a valid command".format(command_str), 'yellow')
-        return None, ''
+        best_match = get_best_match(command_str)
+        fix_response = get_input("Did you mean " + colored('{}', 'magenta', attrs=['underline'])
+                                 .format(best_match) + " [Y/n]? ", condition=lambda i: i.lower() in 'yn',
+                                 err_msg='').lower()
+        if fix_response == 'y':
+            command_str = COMMANDS[best_match]
+        else:
+            return None, ''
     arg_string = split_input[1] if len(split_input) == 2 else ''  # Check if arguments were supplied
     return command_str, arg_string
 
@@ -553,7 +561,7 @@ def switch_diary(name):
         diary = Diary('data.pickle')
 
 # Initialise diary object
-diary = Diary()
+diary = Diary('data.pickle')
 
 # Define command parameters and required information.
 # Variables with the i_ prefix are ParameterInfo types.
